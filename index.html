@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jason Santos — Portfolio</title>
+<style>
+  :root {
+    --navy: #1a2740;
+    --gold: #c9a24b;
+    --bg: #f5f6f8;
+    --card-bg: #ffffff;
+    --text: #1f2430;
+    --muted: #6b7280;
+    --border: #e2e5ea;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.55;
+  }
+  .wrap { max-width: 780px; margin: 0 auto; padding: 60px 24px 80px; }
+  header.hero {
+    background: var(--navy);
+    color: #fff;
+    padding: 56px 24px;
+    text-align: center;
+  }
+  header.hero h1 { font-size: 30px; margin: 0 0 10px; }
+  header.hero p { color: #c7cfdd; margin: 0; font-size: 15.5px; }
+  .cards { display: grid; gap: 18px; margin-top: 40px; }
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+    text-decoration: none;
+    color: var(--text);
+    display: block;
+  }
+  .card:hover { border-color: var(--gold); }
+  .card .tag {
+    display: inline-block;
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--gold);
+    background: rgba(201,162,75,0.12);
+    padding: 3px 10px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+  }
+  .card h2 { font-size: 19px; margin: 0 0 8px; color: var(--navy); }
+  .card p { font-size: 14.5px; color: var(--muted); margin: 0; }
+  footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 50px; }
+  footer a { color: var(--navy); }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <h1>Jason Santos</h1>
+  <p>Client operations &amp; platform implementation — case studies from three years managing a $200M premium finance portfolio</p>
+</header>
+
+<div class="wrap">
+  <div class="cards">
+    <a class="card" href="dashboard-case-study/">
+      <span class="tag">Case Study — Portfolio Analytics</span>
+      <h2>Portfolio Operations Dashboard &amp; Tracking System</h2>
+      <p>How a manual Excel tracker became a Power BI dashboard that drove renewal outreach, onboarding tracking, and weekly account prioritization.</p>
+    </a>
+    <a class="card" href="onboarding-case-study/">
+      <span class="tag">Case Study — Client Operations</span>
+      <h2>Tiered Onboarding Framework</h2>
+      <p>A three-tier onboarding design that cut new-agency ramp time and was formally adopted org-wide after departure.</p>
+    </a>
+  </div>
+</div>
+
+<footer>
+  Jason Santos · <a href="mailto:santos.jason21@gmail.com">santos.jason21@gmail.com</a> · Schaumburg, IL
+</footer>
+
+</body>
+</html>
