@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tiered Onboarding Framework — Case Study | Jason Santos</title>
+<style>
+  :root {
+    --navy: #1a2740;
+    --navy-light: #2c3e5e;
+    --gold: #c9a24b;
+    --bg: #f5f6f8;
+    --card-bg: #ffffff;
+    --text: #1f2430;
+    --muted: #6b7280;
+    --border: #e2e5ea;
+    --green: #1f8a4c;
+    --red: #c0392b;
+    --amber: #b7791f;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+  .wrap { max-width: 800px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  header.hero {
+    background: var(--navy);
+    color: #fff;
+    padding: 48px 24px 40px;
+  }
+  header.hero .wrap { padding-top: 0; padding-bottom: 0; max-width: 800px; }
+  header.hero h1 { font-size: 28px; margin: 0 0 8px; font-weight: 700; }
+  header.hero p.byline { color: #c7cfdd; margin: 0 0 20px; font-size: 15px; }
+  header.hero p.tag {
+    display: inline-block;
+    background: rgba(201,162,75,0.15);
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12.5px;
+    letter-spacing: 0.02em;
+  }
+
+  section { margin-top: 46px; }
+  h2 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 10px;
+    margin-bottom: 18px;
+  }
+  h3 { font-size: 16.5px; margin: 0 0 6px; color: var(--navy); }
+
+  .narrative p { margin: 0 0 14px; font-size: 15.5px; }
+  .narrative p:last-child { margin-bottom: 0; }
+  .narrative strong { color: var(--navy); }
+
+  /* Executive summary */
+  .exec-summary {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--gold);
+    border-radius: 8px;
+    padding: 22px 24px;
+    margin-top: -28px;
+    position: relative;
+    z-index: 2;
+    box-shadow: 0 4px 16px rgba(26,39,64,0.08);
+  }
+  .exec-row { display: flex; gap: 14px; margin-bottom: 14px; }
+  .exec-row:last-child { margin-bottom: 0; }
+  .exec-label {
+    flex: 0 0 84px;
+    font-size: 11.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding-top: 2px;
+  }
+  .exec-label.problem { color: var(--red); }
+  .exec-label.solution { color: var(--navy); }
+  .exec-label.result { color: var(--green); }
+  .exec-text { font-size: 15px; flex: 1; }
+
+  /* Why this matters */
+  .why-matters {
+    background: #eef1f6;
+    border-radius: 8px;
+    padding: 16px 20px;
+    font-size: 14.5px;
+    color: #384866;
+  }
+  .why-matters strong { color: var(--navy); }
+
+  .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .kpi-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 18px 16px; }
+  .kpi-card .label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .kpi-card .value { font-size: 22px; font-weight: 700; color: var(--navy); margin-top: 6px; }
+  .kpi-card .delta { font-size: 12px; margin-top: 4px; color: var(--muted); }
+  .kpi-card .delta.up { color: var(--green); }
+
+  .panel-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .panel-grid.three { grid-template-columns: repeat(3, 1fr); }
+  .panel { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 18px 18px 14px; }
+  .panel.full { grid-column: 1 / -1; }
+  .panel .sub { font-size: 12.5px; color: var(--muted); margin-bottom: 12px; }
+  .panel ul { margin: 0; padding-left: 18px; font-size: 13.5px; }
+  .panel li { margin-bottom: 6px; }
+
+  .tier-badge { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 11.5px; font-weight: 600; background: var(--navy-light); color: #fff; }
+
+  /* Q&A style lessons learned */
+  .qa-list { display: flex; flex-direction: column; gap: 18px; }
+  .qa-item { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 18px 20px; }
+  .qa-q { font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
+  .qa-a { font-size: 14.5px; color: var(--text); margin: 0; }
+
+  /* AI 2026 section */
+  .ai-section {
+    background: #f4f1fb;
+    border: 1px solid #ddd4f0;
+    border-left: 4px solid #7c5cd6;
+    border-radius: 8px;
+    padding: 20px 22px;
+  }
+  .ai-section h2 { color: #5b3fb3; border-bottom-color: #ddd4f0; }
+  .ai-section p { font-size: 14.5px; margin: 0 0 12px; }
+  .ai-section ul { margin: 0; padding-left: 18px; font-size: 14.5px; }
+  .ai-section li { margin-bottom: 8px; }
+  .ai-section strong { color: #4a3391; }
+
+  .disclosure {
+    background: #fbf7ec;
+    border: 1px solid #e8dcb8;
+    border-radius: 8px;
+    padding: 16px 18px;
+    font-size: 13.5px;
+    color: #5c4a1f;
+  }
+  .disclosure strong { color: #3d3113; }
+
+  footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 60px; }
+  footer a { color: var(--navy); }
+
+  @media (max-width: 760px) {
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    .panel-grid, .panel-grid.three { grid-template-columns: 1fr; }
+    .exec-row { flex-direction: column; gap: 4px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="tag">Case Study — Client Operations</p>
+    <h1>Tiered Onboarding Framework</h1>
+    <p class="byline">Designed at Wintrust Financial Corporation; formally adopted org-wide as the standard onboarding playbook after departure · Jason Santos</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="exec-summary">
+    <div class="exec-row">
+      <div class="exec-label problem">Problem</div>
+      <div class="exec-text">Every new agency got the same onboarding sequence regardless of experience level, producing inconsistent ramp times and a steady stream of avoidable support requests.</div>
+    </div>
+    <div class="exec-row">
+      <div class="exec-label solution">Solution</div>
+      <div class="exec-text">A framework that diagnosed each agency's maturity in the first call, then routed them into one of three onboarding paths matched to how much guidance they actually needed.</div>
+    </div>
+    <div class="exec-row">
+      <div class="exec-label result">Result</div>
+      <div class="exec-text">Average ramp time fell from roughly 6-8 weeks to about 3. Formally adopted org-wide as the standard onboarding playbook after I left.</div>
+    </div>
+  </div>
+
+  <section>
+    <div class="why-matters">
+      <strong>Why this matters:</strong> onboarding quality was entirely dependent on which rep happened to run it, with no shared standard. At 75-100 concurrent agency relationships, a slow or inconsistent ramp doesn't just delay one account — it compounds across the book, eating rep capacity that should go toward retention and growth work instead of repeat basic-question support.
+    </div>
+  </section>
+
+  <section class="narrative">
+    <h2>Background</h2>
+    <p>I managed a portfolio of 75-100 concurrent agency relationships worth roughly $200M, with no formal CS infrastructure supporting the role — no dedicated onboarding team, no CS ops function, no tooling built for the job. Onboarding was one part of a broader account management role, run by whichever rep picked up the new agency, using whatever approach they personally preferred.</p>
+  </section>
+
+  <section class="narrative">
+    <h2>The Problem</h2>
+    <p>New agencies arrived with wildly different starting points. Some had run comparable platforms before and could self-serve most of setup. Others had never touched a system like ours and needed hands-on walkthroughs for every step. The existing process didn't distinguish between them: everyone got the same fixed sequence of training calls and feature walkthroughs, regardless of what they actually needed.</p>
+    <p>The failure mode ran in both directions. Experienced agencies got bored and disengaged partway through a process that was slower than they needed, then made avoidable configuration mistakes because they'd stopped paying attention. Inexperienced agencies got rushed through content faster than they could absorb it, then generated support tickets for things that were technically already "covered" in onboarding.</p>
+  </section>
+
+  <section class="narrative">
+    <h2>Constraints</h2>
+    <p>No engineering resources and no budget for onboarding software — whatever I built had to run inside a normal client-operations workflow, using conversation and judgment rather than a system that could auto-route agencies. No baseline data existed on ramp time or onboarding-driven support volume going in, which meant I couldn't design against measured drivers, only against what I was observing directly in the accounts I managed. And I was solving this alongside full account-management responsibility for the rest of the book, not as a dedicated project.</p>
+  </section>
+
+  <section class="narrative">
+    <h2>My Approach</h2>
+    <p>Rather than build more content or a longer training sequence, I built a diagnosis step that ran before onboarding started. The first call became a short structured assessment: platform or comparable-SaaS experience, staff size, and how comfortable the agency's team was with self-service tools. That assessment determined which of three paths the agency entered — the design decision was to spend five minutes up front figuring out who I was actually onboarding, instead of assuming a single sequence would fit everyone.</p>
+  </section>
+
+  <section>
+    <h2>Framework Design</h2>
+    <div class="panel-grid three">
+      <div class="panel">
+        <h3><span class="tier-badge">Tier 1 — Guided</span></h3>
+        <div class="sub">New to the platform, smaller staff, limited prior SaaS exposure</div>
+        <ul>
+          <li>Weekly live walkthroughs, 4-week sequence</li>
+          <li>One workflow introduced and verified working per session, not bundled</li>
+          <li>Scheduled check-ins, not opt-in — removes the burden of the agency having to ask for help</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3><span class="tier-badge">Tier 2 — Coached</span></h3>
+        <div class="sub">Some platform experience, moderate staff size</div>
+        <ul>
+          <li>Biweekly check-ins, 3-week sequence</li>
+          <li>Self-guided setup with support on request</li>
+          <li>Faster path to full feature access once fundamentals confirmed</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3><span class="tier-badge">Tier 3 — Self-serve</span></h3>
+        <div class="sub">Experienced staff, prior platform or SaaS exposure</div>
+        <ul>
+          <li>Single kickoff call, 2-week sequence</li>
+          <li>Documentation-first, support on demand</li>
+          <li>Full access granted early — no artificial gating for agencies that don't need it</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="narrative">
+    <h2>Why It Worked — the Reasoning</h2>
+    <p>The mechanism isn't "we changed onboarding" — it's that <strong>diagnosis before training changes what the training has to accomplish</strong>. A fixed sequence has to be built for an imaginary average agency, which means it's wrong for almost everyone in a specific way: too slow for the experienced, too fast for the novice. Both failure modes convert into the same downstream cost — support tickets — but for opposite reasons. Experienced agencies generate tickets from inattention; novice agencies generate tickets from information they never actually absorbed.</p>
+    <p>Diagnosing maturity first collapses both failure modes at once, because it changes the unit of design from "the onboarding sequence" to "the right onboarding sequence for this agency." Tier 1 agencies get more repetition and smaller steps because that's what sticks on the first pass, which means fewer repeat questions later. Tier 3 agencies get compressed, self-serve access because forcing them through content they don't need is what causes the disengagement in the first place. The framework doesn't work because it's more thorough — it works because it matches training depth to what each agency can actually retain, which is what determines whether a support ticket gets generated three weeks later.</p>
+    <p>The secondary effect was organizational, not just individual: once onboarding didn't depend on a rep's personal style, quality stopped varying by who happened to pick up the account. That's what made it adoptable as a standard rather than staying "how Jason does it."</p>
+  </section>
+
+  <section>
+    <h2>Results</h2>
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="label">Ramp Time, Before</div>
+        <div class="value">6-8 wks</div>
+        <div class="delta">Flat sequence, all agencies</div>
+      </div>
+      <div class="kpi-card">
+        <div class="label">Ramp Time, After</div>
+        <div class="value">~3 wks</div>
+        <div class="delta up">With good habits &amp; receptiveness</div>
+      </div>
+      <div class="kpi-card">
+        <div class="label">Onboarding Pace</div>
+        <div class="value">2-3 / 2wk</div>
+        <div class="delta">New agencies added biweekly</div>
+      </div>
+      <div class="kpi-card">
+        <div class="label">Adoption</div>
+        <div class="value">Org-wide</div>
+        <div class="delta up">Standard playbook post-departure</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Tradeoffs &amp; Lessons Learned</h2>
+    <div class="qa-list">
+      <div class="qa-item">
+        <div class="qa-q">What would I redesign today?</div>
+        <p class="qa-a">The tier assignment happened once, at the first call, and then stayed fixed. In practice, agencies sometimes turned out to need a different pace than the initial assessment predicted — a "Tier 3" agency that assumed it was self-sufficient but stalled on setup, or a "Tier 1" agency that caught on faster than expected. I'd build in a checkpoint partway through each track to re-tier agencies based on actual behavior, not just the first-call read.</p>
+      </div>
+      <div class="qa-item">
+        <div class="qa-q">What data would I collect now that I couldn't then?</div>
+        <p class="qa-a">I was designing against what I observed directly, not against measured baselines — I didn't have a system tracking ramp time or onboarding-driven ticket volume before the framework existed, so the "before" numbers are my own reconstruction, not a report I pulled. Today I'd instrument this from day one: time-to-first-independent-action per tier, support tickets per agency in the first 60 days, and where in the sequence agencies actually stall, so the tier criteria could be tuned against real data instead of judgment alone.</p>
+      </div>
+      <div class="qa-item">
+        <div class="qa-q">What resistance did this face?</div>
+        <p class="qa-a">The honest version: the friction wasn't from agencies, it was from the fact that a diagnosis-first approach takes longer to trust than a fixed checklist — it requires the rep running it to make a judgment call in the first call rather than following a script. That's part of why it needed to be simple enough to run consistently rather than an elaborate scoring model.</p>
+      </div>
+      <div class="qa-item">
+        <div class="qa-q">Where's the limit of this design?</div>
+        <p class="qa-a">It scales by rep judgment, not by system logic — which was the right tradeoff for a 75-100 account book with no engineering support, but it wouldn't hold at meaningfully larger scale without turning the diagnosis step into something more structured and less dependent on an individual rep's read of the client.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="ai-section">
+      <h2>If I Rebuilt This in 2026</h2>
+      <p>The diagnosis step is the part I'd change first. It ran on a rep's judgment during one conversation — that's the exact kind of structured-but-fuzzy classification task an AI copilot is good at supporting, not replacing. A few concrete changes:</p>
+      <ul>
+        <li><strong>Structured intake, not a free-form call.</strong> A short intake form or guided conversation, summarized by an LLM into a maturity read the rep confirms rather than generates from scratch — reduces the variance between reps and gives a record of why an agency landed in a given tier.</li>
+        <li><strong>Dynamic re-tiering.</strong> Instead of a fixed tier assigned once, track engagement signals during onboarding itself (call attendance, self-service actions taken, questions asked) and flag agencies that should move tiers, addressing the exact limitation in the lessons-learned section above.</li>
+        <li><strong>Agentic follow-up.</strong> For Tier 3 self-serve agencies, an onboarding assistant that answers documentation questions in real time removes the main reason self-sufficient agencies still needed a human touchpoint — freeing rep time for Tier 1 agencies who actually need it.</li>
+        <li><strong>Automatic instrumentation.</strong> Every interaction logged from day one, so the "what data would I collect now" answer above stops being retrospective — the system would already be generating the dataset needed to tune tier criteria on a quarterly basis instead of by feel.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <div class="disclosure">
+      <strong>A note on the data:</strong> the ramp-time figures and rollout details reflect the real design and outcome as recalled from managing the portfolio; exact dates and the pilot agency count are illustrative, since underlying Wintrust records are proprietary. The tier structure, diagnosis approach, and org-wide adoption are accurate to what was built and used.
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  Jason Santos · <a href="mailto:santos.jason21@gmail.com">santos.jason21@gmail.com</a> · Schaumburg, IL
+</footer>
+
+</body>
+</html>
