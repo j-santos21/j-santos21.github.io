@@ -25,16 +25,12 @@
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     background: var(--bg);
     color: var(--text);
-    line-height: 1.55;
+    line-height: 1.6;
   }
-  .wrap { max-width: 980px; margin: 0 auto; padding: 40px 24px 80px; }
+  .wrap { max-width: 800px; margin: 0 auto; padding: 40px 24px 80px; }
 
-  header.hero {
-    background: var(--navy);
-    color: #fff;
-    padding: 48px 24px 40px;
-  }
-  header.hero .wrap { padding-top: 0; padding-bottom: 0; }
+  header.hero { background: var(--navy); color: #fff; padding: 48px 24px 40px; }
+  header.hero .wrap { padding-top: 0; padding-bottom: 0; max-width: 800px; }
   header.hero h1 { font-size: 28px; margin: 0 0 8px; font-weight: 700; }
   header.hero p.byline { color: #c7cfdd; margin: 0 0 20px; font-size: 15px; }
   header.hero p.tag {
@@ -48,7 +44,7 @@
     letter-spacing: 0.02em;
   }
 
-  section { margin-top: 44px; }
+  section { margin-top: 46px; }
   h2 {
     font-size: 13px;
     text-transform: uppercase;
@@ -56,45 +52,49 @@
     color: var(--muted);
     border-bottom: 1px solid var(--border);
     padding-bottom: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 18px;
   }
-  h3 { font-size: 17px; margin: 0 0 6px; }
+  h3 { font-size: 16.5px; margin: 0 0 6px; color: var(--navy); }
 
   .narrative p { margin: 0 0 14px; font-size: 15.5px; }
+  .narrative p:last-child { margin-bottom: 0; }
   .narrative strong { color: var(--navy); }
 
-  .kpi-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 14px;
-  }
-  .kpi-card {
+  .exec-summary {
     background: var(--card-bg);
     border: 1px solid var(--border);
+    border-left: 4px solid var(--gold);
     border-radius: 8px;
-    padding: 18px 16px;
+    padding: 22px 24px;
+    margin-top: -28px;
+    position: relative;
+    z-index: 2;
+    box-shadow: 0 4px 16px rgba(26,39,64,0.08);
   }
+  .exec-row { display: flex; gap: 14px; margin-bottom: 14px; }
+  .exec-row:last-child { margin-bottom: 0; }
+  .exec-label { flex: 0 0 84px; font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; }
+  .exec-label.problem { color: var(--red); }
+  .exec-label.solution { color: var(--navy); }
+  .exec-label.result { color: var(--green); }
+  .exec-text { font-size: 15px; flex: 1; }
+
+  .why-matters { background: #eef1f6; border-radius: 8px; padding: 16px 20px; font-size: 14.5px; color: #384866; }
+  .why-matters strong { color: var(--navy); }
+
+  .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .kpi-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 18px 16px; }
   .kpi-card .label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
-  .kpi-card .value { font-size: 24px; font-weight: 700; color: var(--navy); margin-top: 6px; }
-  .kpi-card .delta { font-size: 12.5px; margin-top: 4px; }
+  .kpi-card .value { font-size: 22px; font-weight: 700; color: var(--navy); margin-top: 6px; }
+  .kpi-card .delta { font-size: 12px; margin-top: 4px; color: var(--muted); }
   .kpi-card .delta.up { color: var(--green); }
   .kpi-card .delta.flag { color: var(--amber); }
 
-  .panel-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-  }
-  .panel {
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 18px 18px 12px;
-  }
+  .panel-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .panel { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 18px 18px 12px; }
   .panel.full { grid-column: 1 / -1; }
-  .panel h3 { color: var(--navy); }
   .panel .sub { font-size: 12.5px; color: var(--muted); margin-bottom: 12px; }
-  .panel canvas { max-height: 260px; }
+  .panel canvas { max-height: 220px; }
 
   table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
   th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); }
@@ -103,8 +103,25 @@
   .risk.low { background: #e6f4ea; color: var(--green); }
   .risk.watch { background: #fbf0dc; color: var(--amber); }
   .risk.high { background: #fbe4e1; color: var(--red); }
-
   .tier-badge { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 11.5px; font-weight: 600; background: var(--navy-light); color: #fff; }
+
+  .qa-list { display: flex; flex-direction: column; gap: 18px; }
+  .qa-item { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 18px 20px; }
+  .qa-q { font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
+  .qa-a { font-size: 14.5px; color: var(--text); margin: 0; }
+
+  .ai-section {
+    background: #f4f1fb;
+    border: 1px solid #ddd4f0;
+    border-left: 4px solid #7c5cd6;
+    border-radius: 8px;
+    padding: 20px 22px;
+  }
+  .ai-section h2 { color: #5b3fb3; border-bottom-color: #ddd4f0; }
+  .ai-section p { font-size: 14.5px; margin: 0 0 12px; }
+  .ai-section ul { margin: 0; padding-left: 18px; font-size: 14.5px; }
+  .ai-section li { margin-bottom: 8px; }
+  .ai-section strong { color: #4a3391; }
 
   .disclosure {
     background: #fbf7ec;
@@ -122,6 +139,7 @@
   @media (max-width: 760px) {
     .kpi-grid { grid-template-columns: repeat(2, 1fr); }
     .panel-grid { grid-template-columns: 1fr; }
+    .exec-row { flex-direction: column; gap: 4px; }
   }
 </style>
 </head>
@@ -129,42 +147,79 @@
 
 <header class="hero">
   <div class="wrap">
-    <p class="tag">Case Study — Portfolio Analytics</p>
-    <h1>Portfolio Operations Dashboard</h1>
+    <p class="tag">Case Study — Portfolio Operations</p>
+    <h1>Portfolio Operations Dashboard &amp; Tracking System</h1>
     <p class="byline">Built at Wintrust Financial Corporation to manage a $200M premium finance portfolio across 75–100 concurrent agency relationships · Jason Santos</p>
   </div>
 </header>
 
 <div class="wrap">
 
-  <section class="narrative">
-    <h2>The Problem</h2>
-    <p>The portfolio had no formal CS infrastructure. Engagement health, onboarding progress, and renewal risk across 75–100 agencies lived in scattered exports and manual review. There was no single view that let me prioritize which accounts needed attention this week, versus which were healthy and could wait.</p>
+  <div class="exec-summary">
+    <div class="exec-row">
+      <div class="exec-label problem">Problem</div>
+      <div class="exec-text">Engagement health, onboarding progress, and renewal risk across 75-100 agencies lived in scattered manual review with no single view of where attention was actually needed.</div>
+    </div>
+    <div class="exec-row">
+      <div class="exec-label solution">Solution</div>
+      <div class="exec-text">Built a tracking system, starting in Excel and rebuilt in Power BI as the portfolio outgrew it, that consolidated activity signals, onboarding status, and renewal risk into one weekly view.</div>
+    </div>
+    <div class="exec-row">
+      <div class="exec-label result">Result</div>
+      <div class="exec-text">Renewal outreach shifted from reactive to proactive, onboarding status became visible without asking, and a Sunday-night manual rebuild became a five-minute Monday check.</div>
+    </div>
+  </div>
+
+  <section>
+    <div class="why-matters">
+      <strong>Why this matters:</strong> with no formal CS infrastructure and 75-100 concurrent relationships, the real constraint wasn't effort, it was attention allocation. Without a system to surface which accounts actually needed a call this week, time defaulted to whichever account was loudest, not whichever was most at risk.
+    </div>
   </section>
 
   <section class="narrative">
-    <h2>What I Built</h2>
-    <p>A tracking system that started in Excel — pivot tables and manual scoring — and was rebuilt in Power BI as the portfolio grew past the point Excel could handle cleanly. The dashboard consolidated four things I was previously tracking separately: <strong>portfolio-level trends</strong>, <strong>agency-level activity</strong> (quote volume and transaction frequency, the leading indicators of disengagement), <strong>onboarding progress</strong> against the tiered framework, and <strong>renewal pipeline risk</strong>. The goal was a single view I could open Monday morning and know exactly which 5–10 accounts needed a call that week.</p>
+    <h2>Background</h2>
+    <p>Same portfolio as the onboarding framework: 75-100 concurrent agency relationships, roughly $200M, one person, no dedicated CS tooling or ops function. Engagement tracking, onboarding status, and renewal pipeline were three separate problems I was solving by memory and manual review before this existed.</p>
+  </section>
+
+  <section class="narrative">
+    <h2>The Problem</h2>
+    <p>Quote volume and transaction frequency were the leading indicators of an agency disengaging, but nothing surfaced them proactively — I'd notice a drop only when I happened to pull that agency's activity, usually because something else prompted me to look. Onboarding status for new agencies lived in a running spreadsheet I updated by hand, and renewal risk lived in whatever I remembered from the last conversation with that agency. Three separate tracking problems, none of them systematized, all competing for the same limited weekly attention.</p>
+  </section>
+
+  <section class="narrative">
+    <h2>Constraints</h2>
+    <p>No engineering support and no dedicated analytics tooling budget going in — this had to be something I could build and maintain myself, on the side of full account-management responsibility for the book. No pre-existing view of which metrics actually predicted disengagement or renewal risk; the leading indicators (quote volume, transaction frequency trend) came from my own observation over time, not from a data team's model. And whatever I built had to keep working as the portfolio grew, which is exactly where the Excel version started to break.</p>
+  </section>
+
+  <section class="narrative">
+    <h2>My Approach</h2>
+    <p>I started in Excel because it was the tool I had immediate access to: one tab per tracking dimension, manual pivot tables rebuilt weekly, scoring done by eye against quote volume and transaction counts. That was viable up to roughly 40-50 agencies. Past that point, the update itself started competing with the account work it was supposed to support — a Sunday-night rebuild that ate into the time it was meant to free up. The decision to rebuild in Power BI wasn't about wanting a nicer tool, it was that the manual version had crossed from "helpful" to "a second job."</p>
   </section>
 
   <section>
-    <h2>Evolution: Manual to Automated</h2>
+    <h2>Design: What It Consolidated</h2>
     <div class="panel-grid">
       <div class="panel">
         <h3>Before — Excel</h3>
         <div class="sub">How the tracker started</div>
-        <p style="font-size:14px; margin:0;">A running workbook: one tab per agency-tracking dimension, manual pivot tables rebuilt weekly, scoring done by eye against quote volume and transaction counts. Functional up to roughly 40-50 agencies, then update time started competing with actual account work.</p>
+        <p style="font-size:14px; margin:0;">A running workbook, manual pivot tables rebuilt weekly, scoring done by eye. Functional up to roughly 40-50 agencies, then update time started competing with actual account work.</p>
       </div>
       <div class="panel">
         <h3>After — Power BI</h3>
         <div class="sub">Where it landed</div>
-        <p style="font-size:14px; margin:0;">Same underlying logic — task sequencing and account prioritization by activity signal — rebuilt as a connected model that refreshed automatically instead of by hand. What used to be a Sunday-night rebuild became a five-minute Monday check.</p>
+        <p style="font-size:14px; margin:0;">Same underlying logic — task sequencing and prioritization by activity signal — rebuilt as a connected model that refreshed automatically instead of by hand.</p>
       </div>
     </div>
   </section>
 
+  <section class="narrative">
+    <h2>Why It Worked — the Reasoning</h2>
+    <p>The mechanism isn't "I built a dashboard" — it's that <strong>consolidating three separate tracking problems into one view changed what "attention" meant week to week</strong>. When engagement, onboarding, and renewal risk lived in three different places (memory, a spreadsheet, and nowhere), the accounts that got attention were whichever ones happened to surface — usually the loudest, not the most at-risk. A single consolidated view meant the accounts flagged for outreach were the ones the data actually pointed to, not the ones I happened to remember.</p>
+    <p>The renewal pipeline view is the clearest example: before, a renewal risk only became visible when activity had already been declining for a while and I happened to notice. After, a declining trend showed up as a flag before the renewal date, which meant the outreach conversation could happen while there was still time to change the outcome, not after the relationship had already cooled. The value wasn't the automation itself — it was that the automation moved the signal earlier in the timeline, from reactive to proactive.</p>
+  </section>
+
   <section>
-    <h2>Portfolio Snapshot (sample data)</h2>
+    <h2>Sample Views (illustrative data)</h2>
     <div class="kpi-grid">
       <div class="kpi-card">
         <div class="label">Portfolio Value</div>
@@ -187,70 +242,68 @@
         <div class="delta flag">3 flagged at-risk</div>
       </div>
     </div>
-  </section>
 
-  <section>
-    <h2>Dashboard Views</h2>
-    <div class="panel-grid">
-
+    <div class="panel-grid" style="margin-top:16px;">
       <div class="panel">
         <h3>Portfolio Trend</h3>
-        <div class="sub">Total portfolio value, month-over-month, trailing 12 months</div>
+        <div class="sub">Total portfolio value, trailing 12 months</div>
         <canvas id="trendChart"></canvas>
       </div>
-
       <div class="panel">
-        <h3>Agency Activity — Bottom 10 by Quote Volume</h3>
-        <div class="sub">Early-warning view for disengagement; sorted lowest quote volume first</div>
+        <h3>Agency Activity — Bottom 10</h3>
+        <div class="sub">Early-warning view, sorted lowest quote volume first</div>
         <canvas id="activityChart"></canvas>
       </div>
-
-      <div class="panel full">
-        <h3>Onboarding Progress by Tier</h3>
-        <div class="sub">Agencies in active onboarding, segmented by self-sufficiency tier from the framework</div>
-        <table>
-          <thead>
-            <tr><th>Agency</th><th>Tier</th><th>Week</th><th>Status</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>Meridian Underwriters</td><td><span class="tier-badge">Tier 1 — Guided</span></td><td>2 of 4</td><td><span class="risk low">On track</span></td></tr>
-            <tr><td>Cascade Premium Group</td><td><span class="tier-badge">Tier 2 — Coached</span></td><td>1 of 3</td><td><span class="risk low">On track</span></td></tr>
-            <tr><td>Harbor Point Insurance</td><td><span class="tier-badge">Tier 1 — Guided</span></td><td>3 of 4</td><td><span class="risk watch">Behind pace</span></td></tr>
-            <tr><td>Sable Ridge Agency</td><td><span class="tier-badge">Tier 3 — Self-serve</span></td><td>1 of 2</td><td><span class="risk low">On track</span></td></tr>
-            <tr><td>Northfield Brokers</td><td><span class="tier-badge">Tier 2 — Coached</span></td><td>2 of 3</td><td><span class="risk low">On track</span></td></tr>
-          </tbody>
-        </table>
-      </div>
-
       <div class="panel full">
         <h3>Renewal Pipeline — Next 60 Days</h3>
-        <div class="sub">Flags accounts by activity trend heading into renewal conversation</div>
+        <div class="sub">The view that turned reactive renewal saves into proactive ones</div>
         <table>
-          <thead>
-            <tr><th>Agency</th><th>Renewal Date</th><th>Book Value</th><th>Activity Trend</th><th>Risk</th></tr>
-          </thead>
+          <thead><tr><th>Agency</th><th>Renewal Date</th><th>Book Value</th><th>Activity Trend</th><th>Risk</th></tr></thead>
           <tbody>
             <tr><td>Fieldstone Agency Partners</td><td>Aug 14</td><td>$4.1M</td><td>Flat</td><td><span class="risk low">Low</span></td></tr>
             <tr><td>Redwood Coverage Group</td><td>Aug 22</td><td>$2.8M</td><td>Declining 3 mo.</td><td><span class="risk high">High</span></td></tr>
-            <tr><td>Prairie State Underwriting</td><td>Aug 29</td><td>$6.5M</td><td>Growing</td><td><span class="risk low">Low</span></td></tr>
             <tr><td>Ironclad Risk Partners</td><td>Sep 4</td><td>$3.3M</td><td>Declining 2 mo.</td><td><span class="risk watch">Watch</span></td></tr>
-            <tr><td>Summit Line Agency</td><td>Sep 11</td><td>$1.9M</td><td>Flat</td><td><span class="risk low">Low</span></td></tr>
             <tr><td>Bellcrest Insurance Group</td><td>Sep 19</td><td>$2.2M</td><td>Declining 4 mo.</td><td><span class="risk high">High</span></td></tr>
           </tbody>
         </table>
       </div>
-
     </div>
   </section>
 
-  <section class="narrative">
-    <h2>How It Was Used</h2>
-    <p>Renewal conversations started from the pipeline view, not from memory — accounts flagged "High" or "Watch" got outreach before the renewal date, not after activity had already dropped for a quarter. The onboarding view replaced a running spreadsheet I'd update by hand; anyone could see which agencies were behind pace without asking me. Portfolio trend and activity views were what I opened first each Monday to decide where the week's attention went.</p>
+  <section>
+    <h2>Tradeoffs &amp; Lessons Learned</h2>
+    <div class="qa-list">
+      <div class="qa-item">
+        <div class="qa-q">What would I redesign today?</div>
+        <p class="qa-a">The activity thresholds that triggered a "watch" or "high risk" flag were set by eye, based on what looked concerning to me, not validated against actual churn outcomes. I never had enough downstream data to confirm whether a 3-month decline was actually predictive versus noise. I'd want a feedback loop that fed actual renewal/churn outcomes back into the thresholds, so the flags got more accurate over time instead of staying fixed at my initial judgment.</p>
+      </div>
+      <div class="qa-item">
+        <div class="qa-q">What data would I collect now that I couldn't then?</div>
+        <p class="qa-a">I was tracking quote volume and transaction frequency because those were the signals visible to me manually — I didn't have access to things like support ticket volume, feature adoption depth, or time-since-last-login, all of which are probably better churn predictors than raw activity counts. Today I'd want the dashboard pulling from more of the platform's actual usage data, not just the transaction layer.</p>
+      </div>
+      <div class="qa-item">
+        <div class="qa-q">Where's the limit of this design?</div>
+        <p class="qa-a">It's a single-operator tool — built for how I personally triaged the book, not designed to be handed to a team with shared definitions of what "at risk" means. Scaling it beyond one person would require turning my personal judgment calls into documented, agreed-upon criteria.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="ai-section">
+      <h2>If I Rebuilt This in 2026</h2>
+      <p>The Excel-to-Power BI shift solved the update-burden problem but didn't solve the threshold problem above — the flags were still my own judgment, encoded once. A few changes I'd make with what's available now:</p>
+      <ul>
+        <li><strong>LLM-assisted triage summaries.</strong> Instead of a rep scanning tables of flagged accounts, a weekly summary that explains in plain language why each flagged account is flagged — "declining transaction volume, 3rd month, similar pattern to two accounts that churned last year" — turns a data table into a decision aid.</li>
+        <li><strong>Outcome-linked thresholds.</strong> Feed actual renewal outcomes back into the model so risk thresholds adjust based on what actually predicted churn, addressing the exact gap named in lessons learned above, instead of staying fixed at my original judgment calls.</li>
+        <li><strong>Natural-language querying.</strong> Instead of building a fixed set of dashboard views in advance, letting a rep ask "which agencies in Tier 1 onboarding haven't logged in this week" directly, without needing a new report built for every new question.</li>
+        <li><strong>Automated first-pass outreach drafts.</strong> For flagged renewal-risk accounts, a drafted outreach note referencing the specific activity trend, ready for a human to review and personalize rather than starting from a blank page — shrinking the gap between "flag surfaces" and "outreach happens."</li>
+      </ul>
+    </div>
   </section>
 
   <section>
     <div class="disclosure">
-      <strong>A note on the data:</strong> the dashboards above use illustrative sample data — agency names, exact figures, and renewal dates are fabricated for this walkthrough, since the underlying Wintrust data is proprietary. The structure, metrics, and workflow shown reflect the actual dashboards I built and used to manage the portfolio, including the shift from a manual Excel-based tracker to Power BI as the process scaled.
+      <strong>A note on the data:</strong> the views above use illustrative sample data — agency names, exact figures, and renewal dates are fabricated for this walkthrough, since the underlying Wintrust data is proprietary. The structure, metrics, and workflow shown reflect the actual dashboards I built and used to manage the portfolio, including the shift from a manual Excel-based tracker to Power BI as the process scaled.
     </div>
   </section>
 
