@@ -135,6 +135,12 @@
     font-size: 13px;
   }
 
+  .role-list { display: flex; flex-direction: column; gap: 10px; }
+  .role-item { display: flex; gap: 12px; align-items: flex-start; }
+  .role-dot { flex: 0 0 8px; width: 8px; height: 8px; border-radius: 50%; background: var(--gold); margin-top: 7px; }
+  .role-text { font-size: 14.5px; }
+  .role-text strong { color: var(--navy); }
+
   .qa-list { display: flex; flex-direction: column; gap: 18px; }
   .qa-item { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 18px 20px; }
   .qa-q { font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
@@ -250,7 +256,7 @@
         <div class="esc-arrow">→</div>
         <div class="esc-step">
           <div class="esc-title">Scoped Escalation</div>
-          <div class="esc-sub">BA manager, inside sales EVP, or IT compliance officer depending on severity</div>
+          <div class="esc-sub">BA manager, inside sales EVP, or SVP - Business Line Information Systems (BLIS) Officer depending on severity</div>
         </div>
       </div>
     </div>
@@ -271,6 +277,17 @@
   </section>
 
   <section>
+    <h2>My Role</h2>
+    <div class="role-list">
+      <div class="role-item"><div class="role-dot"></div><div class="role-text"><strong>Ran</strong> UAT and regression testing ahead of releases, working financial workflows end-to-end rather than testing fields in isolation.</div></div>
+      <div class="role-item"><div class="role-dot"></div><div class="role-text"><strong>Identified</strong> the buy-rate sequencing defect by testing the rate configuration workflow in the order an agency would actually use it.</div></div>
+      <div class="role-item"><div class="role-dot"></div><div class="role-text"><strong>Assessed</strong> business risk on defects found — distinguishing a cosmetic issue from one with compliance or client-trust exposure — to decide what justified holding a release.</div></div>
+      <div class="role-item"><div class="role-dot"></div><div class="role-text"><strong>Escalated</strong> findings through the defined path to engineering, and further up to BA management, sales leadership, or IT compliance leadership when severity warranted it.</div></div>
+      <div class="role-item"><div class="role-dot"></div><div class="role-text"><strong>Communicated</strong> the buy-rate defect and its downstream consequence clearly enough, and fast enough, to hold a release inside a compressed Sunday deployment window.</div></div>
+    </div>
+  </section>
+
+  <section>
     <h2>Scope (illustrative detail)</h2>
     <div class="kpi-grid">
       <div class="kpi-card">
@@ -286,7 +303,7 @@
       <div class="kpi-card">
         <div class="label">Escalation Tiers</div>
         <div class="value">3</div>
-        <div class="delta">BA manager / sales EVP / IT compliance</div>
+        <div class="delta">BA manager / sales EVP / SVP - BLIS Officer</div>
       </div>
       <div class="kpi-card">
         <div class="label">Flagship Catch</div>
@@ -326,14 +343,14 @@
         <li><strong>AI-assisted regression suite generation.</strong> Feed known-fragile workflows (like the rate-field sequencing dependency) into a test-generation tool that builds and maintains automated coverage for field-interaction bugs, not just single-field validation — the exact category a script checking fields in isolation would have missed.</li>
         <li><strong>Anomaly detection on QA runs.</strong> Instead of a tester needing to visually notice a value silently resetting, an automated diff on before/after field states during test runs would flag the exact symptom that surfaced the buy-rate defect, automatically.</li>
         <li><strong>A living defect knowledge base.</strong> An LLM-summarized log of every defect found, tagged by workflow and root cause, so patterns get surfaced proactively — directly answering the "what data would I collect now" gap above.</li>
-        <li><strong>Severity-routed escalation drafts.</strong> AI-drafted summaries that route to the right stakeholder — BA manager, sales EVP, or IT compliance — based on defect severity and business risk, cutting the time between a catch and a decision inside a fixed deployment window.</li>
+        <li><strong>Severity-routed escalation drafts.</strong> AI-drafted summaries that route to the right stakeholder — BA manager, sales EVP, or the SVP - BLIS Officer — based on defect severity and business risk, cutting the time between a catch and a decision inside a fixed deployment window.</li>
       </ul>
     </div>
   </section>
 
   <section>
     <div class="disclosure">
-      <strong>A note on the data:</strong> exact release counts and dates are illustrative, since underlying Wintrust records and systems are proprietary. The testing methodology, escalation structure, release cadence, and the buy-rate sequencing defect are accurate to what was found and handled; internal title names (e.g. the specific IT compliance role) are described generally where I'm not certain of the exact formal title.
+      <strong>A note on the data:</strong> exact release counts and dates are illustrative, since underlying Wintrust records and systems are proprietary. The testing methodology, escalation structure, release cadence, and the buy-rate sequencing defect are accurate to what was found and handled.
     </div>
   </section>
 
