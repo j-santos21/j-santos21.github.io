@@ -31,6 +31,7 @@
   }
   header.hero h1 { font-size: 30px; margin: 0 0 10px; }
   header.hero p { color: #c7cfdd; margin: 0; font-size: 15.5px; }
+  header.hero p.positioning { color: #fff; font-size: 16.5px; font-weight: 600; margin: 18px 0 0; }
   .cards { display: grid; gap: 18px; margin-top: 40px; }
   .card {
     background: var(--card-bg);
@@ -42,6 +43,8 @@
     display: block;
   }
   .card:hover { border-color: var(--gold); }
+  .card.featured { border: 1px solid var(--gold); background: #fdfaf3; }
+  .card.featured .tag { background: rgba(201,162,75,0.2); }
   .card .tag {
     display: inline-block;
     font-size: 11.5px;
@@ -64,10 +67,16 @@
 <header class="hero">
   <h1>Jason Santos</h1>
   <p>Client operations &amp; platform implementation — case studies from three years managing a $200M premium finance portfolio</p>
+  <p class="positioning">I build operational systems that reduce ambiguity: client operations, implementation, and analytics work built to outlast the person who built it.</p>
 </header>
 
 <div class="wrap">
   <div class="cards">
+    <a class="card featured" href="how-i-solve-problems/">
+      <span class="tag">Framework</span>
+      <h2>How I Solve Operational Problems</h2>
+      <p>The lens behind all three case studies below — how I approach a messy operational problem from first signal to a system that scales past me.</p>
+    </a>
     <a class="card" href="dashboard-case-study/">
       <span class="tag">Case Study — Portfolio Analytics</span>
       <h2>Portfolio Operations Dashboard &amp; Tracking System</h2>
