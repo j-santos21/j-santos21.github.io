@@ -105,6 +105,12 @@
   .risk.high { background: #fbe4e1; color: var(--red); }
   .tier-badge { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 11.5px; font-weight: 600; background: var(--navy-light); color: #fff; }
 
+  .role-list { display: flex; flex-direction: column; gap: 10px; }
+  .role-item { display: flex; gap: 12px; align-items: flex-start; }
+  .role-dot { flex: 0 0 8px; width: 8px; height: 8px; border-radius: 50%; background: var(--gold); margin-top: 7px; }
+  .role-text { font-size: 14.5px; }
+  .role-text strong { color: var(--navy); }
+
   .qa-list { display: flex; flex-direction: column; gap: 18px; }
   .qa-item { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 18px 20px; }
   .qa-q { font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
@@ -216,6 +222,17 @@
     <h2>Why It Worked — the Reasoning</h2>
     <p>The mechanism isn't "I built a dashboard" — it's that <strong>consolidating three separate tracking problems into one view changed what "attention" meant week to week</strong>. When engagement, onboarding, and renewal risk lived in three different places (memory, a spreadsheet, and nowhere), the accounts that got attention were whichever ones happened to surface — usually the loudest, not the most at-risk. A single consolidated view meant the accounts flagged for outreach were the ones the data actually pointed to, not the ones I happened to remember.</p>
     <p>The renewal pipeline view is the clearest example: before, a renewal risk only became visible when activity had already been declining for a while and I happened to notice. After, a declining trend showed up as a flag before the renewal date, which meant the outreach conversation could happen while there was still time to change the outcome, not after the relationship had already cooled. The value wasn't the automation itself — it was that the automation moved the signal earlier in the timeline, from reactive to proactive.</p>
+  </section>
+
+  <section>
+    <h2>My Role</h2>
+    <div class="role-list">
+      <div class="role-item"><div class="role-dot"></div><div class="role-text"><strong>Identified</strong> that engagement tracking, onboarding status, and renewal risk were three separate untracked problems competing for the same limited weekly attention.</div></div>
+      <div class="role-item"><div class="role-dot"></div><div class="role-text"><strong>Built</strong> the original Excel-based tracker, then redesigned and rebuilt it in Power BI once the manual version stopped scaling.</div></div>
+      <div class="role-item"><div class="role-dot"></div><div class="role-text"><strong>Defined</strong> the activity signals and thresholds used to flag disengagement and renewal risk, based on direct observation of the portfolio over time.</div></div>
+      <div class="role-item"><div class="role-dot"></div><div class="role-text"><strong>Used</strong> the resulting views weekly to prioritize account outreach and time renewal conversations before risk became visible any other way.</div></div>
+      <div class="role-item"><div class="role-dot"></div><div class="role-text"><strong>Maintained</strong> the system solo, without engineering or analytics support, alongside full account-management responsibility for the book.</div></div>
+    </div>
   </section>
 
   <section>
