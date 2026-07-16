@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How I Solve Operational Problems | Jason Santos</title>
+<style>
+  :root {
+    --navy: #1a2740;
+    --navy-light: #2c3e5e;
+    --gold: #c9a24b;
+    --bg: #f5f6f8;
+    --card-bg: #ffffff;
+    --text: #1f2430;
+    --muted: #6b7280;
+    --border: #e2e5ea;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+  .wrap { max-width: 800px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  header.hero { background: var(--navy); color: #fff; padding: 48px 24px 40px; }
+  header.hero .wrap { padding-top: 0; padding-bottom: 0; max-width: 800px; }
+  header.hero h1 { font-size: 28px; margin: 0 0 8px; font-weight: 700; }
+  header.hero p.byline { color: #c7cfdd; margin: 0; font-size: 15px; }
+  header.hero p.tag {
+    display: inline-block;
+    background: rgba(201,162,75,0.15);
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12.5px;
+    letter-spacing: 0.02em;
+    margin-bottom: 14px;
+  }
+
+  section { margin-top: 46px; }
+  h2 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 10px;
+    margin-bottom: 18px;
+  }
+
+  .narrative p { margin: 0 0 14px; font-size: 15.5px; }
+  .narrative p:last-child { margin-bottom: 0; }
+  .narrative strong { color: var(--navy); }
+
+  .steps { display: flex; flex-direction: column; gap: 0; }
+  .step {
+    display: flex;
+    gap: 20px;
+    padding: 22px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .step:last-child { border-bottom: none; }
+  .step-num {
+    flex: 0 0 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--navy);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 15px;
+  }
+  .step-body h3 { font-size: 17px; margin: 0 0 8px; color: var(--navy); }
+  .step-body p { font-size: 14.5px; margin: 0 0 10px; }
+  .step-body p:last-child { margin-bottom: 0; }
+  .step-evidence {
+    font-size: 13px;
+    color: var(--muted);
+    background: var(--bg);
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin-top: 8px;
+  }
+  .step-evidence a { color: var(--navy); text-decoration: underline; }
+
+  .close-note {
+    background: #eef1f6;
+    border-radius: 8px;
+    padding: 18px 20px;
+    font-size: 14.5px;
+    color: #384866;
+  }
+  .close-note strong { color: var(--navy); }
+
+  footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 60px; }
+  footer a { color: var(--navy); }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="tag">Framework</p>
+    <h1>How I Solve Operational Problems</h1>
+    <p class="byline">The pattern behind the three case studies in this portfolio · Jason Santos</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section class="narrative">
+    <p>Three different problems — a dashboard, an onboarding process, a release testing pipeline — but the same underlying approach shows up in each one. This page names that approach directly, so it doesn't have to be inferred from reading all three.</p>
+  </section>
+
+  <section>
+    <div class="steps">
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h3>Notice the friction directly, not through a report</h3>
+          <p>None of these problems showed up as an assigned project. They showed up as something that kept costing time or attention week after week — three untracked signals competing for focus, an onboarding process that some agencies visibly outgrew and others visibly drowned in, a defect that wouldn't have thrown an error if I hadn't been looking for it.</p>
+          <div class="step-evidence">Every case study in this portfolio started this way, not from a request to "build a dashboard" or "improve onboarding."</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h3>Diagnose before building</h3>
+          <p>The instinct is to start building a fix immediately. The better move is figuring out what's actually different about each case first — what does this specific agency need, what does this specific workflow actually depend on — because a fix built for an average case is wrong for almost everyone in a specific, predictable way.</p>
+          <div class="step-evidence">See: the first-call diagnosis in the <a href="onboarding-case-study/">onboarding framework</a>, and testing workflows in sequence rather than fields in isolation in the <a href="release-testing-case-study/">release testing</a> case study.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h3>Consolidate scattered signals into one place</h3>
+          <p>Problems that live in three different places — memory, a spreadsheet, and nowhere — don't get solved by getting better at any one of them. They get solved by putting them somewhere they can be compared against each other, so attention goes where the data points, not where the loudest account happens to be.</p>
+          <div class="step-evidence">See: the <a href="dashboard-case-study/">portfolio dashboard</a>, which consolidated engagement, onboarding, and renewal risk into a single weekly view.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h3>Build the smallest system the constraint allows</h3>
+          <p>No engineering support, no dedicated tooling budget, and a day job that didn't pause while the fix got built — every one of these had to work inside those limits, which meant starting with the simplest version that solved the actual problem, not the most complete one.</p>
+          <div class="step-evidence">See: starting in Excel before Power BI, and a five-minute diagnostic call instead of a formal intake system, in the dashboard and onboarding case studies.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <h3>Route decisions by business risk, not technical severity</h3>
+          <p>Not every issue deserves the same response. The question that actually matters isn't "how big is this bug" or "how far behind is this agency" — it's what happens downstream if this doesn't get addressed. A rate defect that could reach a real quote gets escalated differently than a cosmetic issue. A renewal account with a declining trend gets a call before an account that's merely quiet.</p>
+          <div class="step-evidence">See: the escalation path in <a href="release-testing-case-study/">release testing</a>, and the renewal-risk flagging logic in the dashboard case study.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">6</div>
+        <div class="step-body">
+          <h3>Ship it, use it, and let real behavior reveal what's wrong with it</h3>
+          <p>None of these were designed perfectly the first time, and I don't think that's a flaw in the approach — a system that hasn't been used yet is still a guess. The tier assignment that should have been revisited partway through onboarding, the risk thresholds that were set by eye instead of validated against outcomes: those are things you only find by running the system against real cases, not by planning harder up front.</p>
+          <div class="step-evidence">See the Tradeoffs &amp; Lessons Learned section in each case study — that's this step, made explicit.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">7</div>
+        <div class="step-body">
+          <h3>Document it so it works after you're gone</h3>
+          <p>A fix that only works while you're the one running it isn't actually a system — it's a habit. The last step is making the logic explicit enough that someone else can run it without you, which is also the test of whether you actually solved the underlying problem or just got good at working around it yourself.</p>
+          <div class="step-evidence">See: the onboarding framework, formally adopted org-wide as the standard playbook after departure.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <div class="close-note">
+      <strong>Why this matters more than any single artifact:</strong> the dashboard, the onboarding framework, and the release testing process are three different outputs of the same process. The process is the actual skill; the artifacts are proof it was applied consistently, not three unrelated projects that happened to work out.
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  Jason Santos · <a href="mailto:santos.jason21@gmail.com">santos.jason21@gmail.com</a> · Schaumburg, IL
+</footer>
+
+</body>
+</html>
