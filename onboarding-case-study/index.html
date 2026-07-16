@@ -117,6 +117,12 @@
 
   .tier-badge { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 11.5px; font-weight: 600; background: var(--navy-light); color: #fff; }
 
+  .role-list { display: flex; flex-direction: column; gap: 10px; }
+  .role-item { display: flex; gap: 12px; align-items: flex-start; }
+  .role-dot { flex: 0 0 8px; width: 8px; height: 8px; border-radius: 50%; background: var(--gold); margin-top: 7px; }
+  .role-text { font-size: 14.5px; }
+  .role-text strong { color: var(--navy); }
+
   /* Q&A style lessons learned */
   .qa-list { display: flex; flex-direction: column; gap: 18px; }
   .qa-item { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 18px 20px; }
@@ -249,6 +255,17 @@
     <p>The mechanism isn't "we changed onboarding" — it's that <strong>diagnosis before training changes what the training has to accomplish</strong>. A fixed sequence has to be built for an imaginary average agency, which means it's wrong for almost everyone in a specific way: too slow for the experienced, too fast for the novice. Both failure modes convert into the same downstream cost — support tickets — but for opposite reasons. Experienced agencies generate tickets from inattention; novice agencies generate tickets from information they never actually absorbed.</p>
     <p>Diagnosing maturity first collapses both failure modes at once, because it changes the unit of design from "the onboarding sequence" to "the right onboarding sequence for this agency." Tier 1 agencies get more repetition and smaller steps because that's what sticks on the first pass, which means fewer repeat questions later. Tier 3 agencies get compressed, self-serve access because forcing them through content they don't need is what causes the disengagement in the first place. The framework doesn't work because it's more thorough — it works because it matches training depth to what each agency can actually retain, which is what determines whether a support ticket gets generated three weeks later.</p>
     <p>The secondary effect was organizational, not just individual: once onboarding didn't depend on a rep's personal style, quality stopped varying by who happened to pick up the account. That's what made it adoptable as a standard rather than staying "how Jason does it."</p>
+  </section>
+
+  <section>
+    <h2>My Role</h2>
+    <div class="role-list">
+      <div class="role-item"><div class="role-dot"></div><div class="role-text"><strong>Identified</strong> the operational bottleneck — inconsistent ramp times and a flat onboarding sequence that didn't fit most agencies — from direct account management, not a formal research process.</div></div>
+      <div class="role-item"><div class="role-dot"></div><div class="role-text"><strong>Designed</strong> the diagnostic first-call assessment and the three-tier onboarding structure it routed into.</div></div>
+      <div class="role-item"><div class="role-dot"></div><div class="role-text"><strong>Ran</strong> the framework directly across new agencies, refining the diagnosis criteria as real onboardings surfaced edge cases.</div></div>
+      <div class="role-item"><div class="role-dot"></div><div class="role-text"><strong>Built</strong> the logic for what each tier required — cadence, content sequencing, and access timing — without engineering or design support.</div></div>
+      <div class="role-item"><div class="role-dot"></div><div class="role-text"><strong>Documented</strong> the framework clearly enough that it outlasted my tenure and was formally adopted as the org-wide standard after I left.</div></div>
+    </div>
   </section>
 
   <section>
