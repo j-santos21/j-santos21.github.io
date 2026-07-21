@@ -3,10 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jason Santos — Portfolio</title>
+<title>Jason Santos - Portfolio</title>
 <style>
   :root {
     --navy: #1a2740;
+    --navy-light: #2c3e5e;
     --gold: #c9a24b;
     --bg: #f5f6f8;
     --card-bg: #ffffff;
@@ -22,17 +23,69 @@
     color: var(--text);
     line-height: 1.55;
   }
-  .wrap { max-width: 780px; margin: 0 auto; padding: 60px 24px 80px; }
+  .wrap { max-width: 780px; margin: 0 auto; padding: 48px 24px 80px; }
   header.hero {
     background: var(--navy);
     color: #fff;
-    padding: 56px 24px;
+    padding: 56px 24px 48px;
     text-align: center;
   }
-  header.hero h1 { font-size: 30px; margin: 0 0 10px; }
-  header.hero p { color: #c7cfdd; margin: 0; font-size: 15.5px; }
-  header.hero p.positioning { color: #fff; font-size: 16.5px; font-weight: 600; margin: 18px 0 0; }
-  .cards { display: grid; gap: 18px; margin-top: 40px; }
+  header.hero h1 { font-size: 30px; margin: 0 0 6px; }
+  header.hero p.role { color: var(--gold); margin: 0 0 20px; font-size: 13.5px; text-transform: uppercase; letter-spacing: 0.1em; }
+  header.hero p.positioning { color: #fff; font-size: 17.5px; font-weight: 600; margin: 0 auto; max-width: 640px; line-height: 1.5; }
+  header.hero p.context { color: #c7cfdd; font-size: 14.5px; margin: 16px auto 0; max-width: 620px; }
+  header.hero p.focus {
+    display: inline-block;
+    margin: 22px 0 0;
+    padding: 6px 16px;
+    border: 1px solid rgba(201,162,75,0.5);
+    border-radius: 20px;
+    color: var(--gold);
+    font-size: 13.5px;
+  }
+
+  .hook {
+    font-size: 15px;
+    color: var(--text);
+    max-width: 640px;
+    margin: 32px auto 0;
+    text-align: center;
+    font-style: italic;
+  }
+
+  .pattern {
+    background: var(--navy);
+    color: #fff;
+    border-radius: 10px;
+    padding: 26px 28px;
+    margin-bottom: 18px;
+  }
+  .pattern p.lede { font-size: 17px; font-weight: 600; margin: 0 0 10px; }
+  .pattern p.body { font-size: 14.5px; color: #c7cfdd; margin: 0; }
+  .pattern strong { color: var(--gold); font-weight: 600; }
+
+  .principles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 36px; }
+  .principle {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--gold);
+    border-radius: 8px;
+    padding: 16px 18px;
+    font-size: 14.5px;
+    font-weight: 600;
+    color: var(--navy);
+    text-align: center;
+  }
+
+  .section-label {
+    font-size: 12.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin: 44px 0 14px;
+  }
+
+  .cards { display: grid; gap: 18px; }
   .card {
     background: var(--card-bg);
     border: 1px solid var(--border);
@@ -43,7 +96,7 @@
     display: block;
   }
   .card:hover { border-color: var(--gold); }
-  .card.featured { border: 1px solid var(--gold); background: #fdfaf3; }
+  .card.featured { border: 1px solid var(--gold); background: #fdfaf3; padding: 28px; }
   .card.featured .tag { background: rgba(201,162,75,0.2); }
   .card .tag {
     display: inline-block;
@@ -57,42 +110,108 @@
     margin-bottom: 10px;
   }
   .card h2 { font-size: 19px; margin: 0 0 8px; color: var(--navy); }
+  .card.featured h2 { font-size: 21px; }
   .card p { font-size: 14.5px; color: var(--muted); margin: 0; }
+  .mini-flow { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; align-items: center; }
+  .mini-step {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--navy);
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 4px 11px;
+    white-space: nowrap;
+  }
+  .mini-arrow { color: var(--gold); font-size: 13px; }
+
+  .ai-note {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+    margin-top: 18px;
+  }
+  .ai-note h2 { font-size: 19px; margin: 0 0 10px; color: var(--navy); }
+  .ai-note p { font-size: 14.5px; color: var(--text); margin: 0 0 12px; }
+  .ai-note p:last-child { margin-bottom: 0; }
+
   footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 50px; }
   footer a { color: var(--navy); }
+
+  @media (max-width: 640px) {
+    .principles { grid-template-columns: 1fr; }
+  }
 </style>
 </head>
 <body>
 
 <header class="hero">
   <h1>Jason Santos</h1>
-  <p>Client operations &amp; platform implementation — case studies from three years managing a $200M premium finance portfolio</p>
-  <p class="positioning">I build operational systems that reduce ambiguity: client operations, implementation, and analytics work built to outlast the person who built it.</p>
+  <p class="role">Operations · Implementation · Systems Design</p>
+  <p class="positioning">I turn operational ambiguity into decision systems that keep working after I hand them off.</p>
+  <p class="context">Three years managing a $200M portfolio at Wintrust Financial. My workflow today is iterative, evidence-driven, and AI-assisted.</p>
+  <p class="focus">Current focus: AI-native operations, implementation, and systems design</p>
 </header>
 
 <div class="wrap">
+
+  <div class="principles">
+    <div class="principle">Diagnose before you build.</div>
+    <div class="principle">Route by business risk, not technical severity.</div>
+    <div class="principle">A fix only you can run is a habit, not a system.</div>
+  </div>
+
+  <p class="hook">Over time I noticed the work I gravitated toward was never the work with the clearest requirements. It was the work nobody quite knew how to define yet - the part of the job that has no owner until someone decides it's theirs.</p>
+
+  <p class="section-label">Start here</p>
   <div class="cards">
     <a class="card featured" href="how-i-solve-problems/">
-      <span class="tag">Framework</span>
-      <h2>How I Solve Operational Problems</h2>
-      <p>The lens behind all three case studies below — how I approach a messy operational problem from first signal to a system that scales past me.</p>
-    </a>
-    <a class="card" href="dashboard-case-study/">
-      <span class="tag">Case Study — Portfolio Analytics</span>
-      <h2>Portfolio Operations Dashboard &amp; Tracking System</h2>
-      <p>How a manual Excel tracker became a Power BI dashboard that drove renewal outreach, onboarding tracking, and weekly account prioritization.</p>
-    </a>
-    <a class="card" href="onboarding-case-study/">
-      <span class="tag">Case Study — Client Operations</span>
-      <h2>Tiered Onboarding Framework</h2>
-      <p>A three-tier onboarding design that cut new-agency ramp time and was formally adopted org-wide after departure.</p>
-    </a>
-    <a class="card" href="release-testing-case-study/">
-      <span class="tag">Case Study — Technical Implementation &amp; QA</span>
-      <h2>Platform Release Testing &amp; Cross-Functional Implementation</h2>
-      <p>UAT and regression testing on a live regulated financial platform, including a rate-configuration defect caught before it could reach a real quote.</p>
+      <span class="tag">The Framework</span>
+      <h2>How I Think</h2>
+      <p>The operating system behind everything on this site. Seven steps, from first signal to a system that outlasts its builder. If you read one page, read this one.</p>
+      <div class="mini-flow">
+        <span class="mini-step">Notice</span><span class="mini-arrow">→</span>
+        <span class="mini-step">Diagnose</span><span class="mini-arrow">→</span>
+        <span class="mini-step">Consolidate</span><span class="mini-arrow">→</span>
+        <span class="mini-step">Build small</span><span class="mini-arrow">→</span>
+        <span class="mini-step">Route by risk</span><span class="mini-arrow">→</span>
+        <span class="mini-step">Ship &amp; learn</span><span class="mini-arrow">→</span>
+        <span class="mini-step">Document</span>
+      </div>
     </a>
   </div>
+
+  <p class="section-label">The pattern</p>
+  <div class="pattern">
+    <p class="lede">Three case studies. Three business functions. One way of thinking.</p>
+    <p class="body">These aren't three unrelated projects that happened to work out. They're the same capability - <strong>turning an ambiguous, unowned problem into a system someone else can run</strong> - demonstrated in analytics, client operations, and QA. The fourth run is the one you're looking at: this site, same loop, applied to a problem no job description covers.</p>
+  </div>
+  <div class="cards">
+    <a class="card" href="dashboard-case-study/">
+      <span class="tag">Case Study - Portfolio Analytics</span>
+      <h2>Portfolio Operations Dashboard &amp; Tracking System</h2>
+      <p>Three untracked signals consolidated into one weekly view. A manual Excel tracker became a Power BI system that moved renewal outreach from reactive to proactive.</p>
+    </a>
+    <a class="card" href="onboarding-case-study/">
+      <span class="tag">Case Study - Client Operations</span>
+      <h2>Tiered Onboarding Framework</h2>
+      <p>Diagnosis before training: a three-tier design that cut ramp time from 6-8 weeks to about 3, and was formally adopted org-wide after I left.</p>
+    </a>
+    <a class="card" href="release-testing-case-study/">
+      <span class="tag">Case Study - Technical Implementation &amp; QA</span>
+      <h2>Platform Release Testing &amp; Cross-Functional Implementation</h2>
+      <p>UAT on a live regulated platform, including a silent rate-configuration defect caught by testing the workflow the way a real user runs it.</p>
+    </a>
+  </div>
+
+  <p class="section-label">How I work with AI</p>
+  <div class="ai-note">
+    <h2>AI is how I run the framework faster, not the framework itself</h2>
+    <p>The process above predates my AI workflow. What changed is the speed of each step: I use Claude and similar tools to pressure-test reasoning before committing to it, to prototype in hours what used to take weeks (this site included), and to turn half-formed observations into something a stakeholder can react to the same day. The judgment calls stay mine. AI shortens the distance between noticing a problem and showing someone a fix.</p>
+    <p>Someone with the same experience who doesn't work this way arrives at similar insights slower, and usually keeps them in their head. Mine end up documented, testable, and shareable. The honest version of the differentiation: you could copy the tools in an afternoon. The judgment about which problem to solve is the part that took years.</p>
+  </div>
+
 </div>
 
 <footer>
