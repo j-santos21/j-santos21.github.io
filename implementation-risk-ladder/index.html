@@ -1,0 +1,580 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="A kickoff scoring model that sets the go-live commitment from a six-factor risk tier instead of a flat standard timeline. Portfolio case study by Jason Santos.">
+<meta name="author" content="Jason Santos">
+<meta property="og:title" content="Implementation Risk Ladder">
+<meta property="og:description" content="A kickoff scoring model that sets the go-live commitment from a six-factor risk tier instead of a flat standard timeline. Portfolio case study by Jason Santos.">
+<meta property="og:type" content="article">
+<title>Implementation Risk Ladder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=JetBrains+Mono:wght@500;700&display=swap">
+
+<style>
+:root{
+  --ground:#F6F8F7; --surface:#FFFFFF; --surface-2:#EEF2F0;
+  --ink:#141D1B; --ink-2:#3C4F4B; --muted:#5A6B67; --hair:#DCE4E1;
+  --accent:#0E6B5C; --accent-soft:#E2F0EC;
+  --t1:#2F7F6E; --t2:#A8801F; --t3:#BE5B2A; --t4:#9C3629;
+  --t1-bg:#E6F1ED; --t2-bg:#F6EEDA; --t3-bg:#F8E8DD; --t4-bg:#F7E2DE;
+  --shadow:0 1px 2px rgba(20,29,27,.05), 0 8px 24px -16px rgba(20,29,27,.18);
+  --f-display:"Archivo",-apple-system,"Segoe UI",sans-serif;
+  --f-prose:"Source Serif 4",Georgia,serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#0E1413; --surface:#161E1C; --surface-2:#1D2725;
+    --ink:#E7EEEB; --ink-2:#C2D0CC; --muted:#8FA29D; --hair:#26312E;
+    --accent:#4CBFA6; --accent-soft:#152B27;
+    --t1:#4FA592; --t2:#D3A63A; --t3:#DD7B45; --t4:#C55F4E;
+    --t1-bg:#152722; --t2-bg:#2A2312; --t3-bg:#2B1D14; --t4-bg:#2A1815;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0E1413; --surface:#161E1C; --surface-2:#1D2725;
+  --ink:#E7EEEB; --ink-2:#C2D0CC; --muted:#8FA29D; --hair:#26312E;
+  --accent:#4CBFA6; --accent-soft:#152B27;
+  --t1:#4FA592; --t2:#D3A63A; --t3:#DD7B45; --t4:#C55F4E;
+  --t1-bg:#152722; --t2-bg:#2A2312; --t3-bg:#2B1D14; --t4-bg:#2A1815;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.7);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--ground); color:var(--ink);
+  font-family:var(--f-prose); font-size:17px; line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+.shell{max-width:1060px; margin:0 auto; padding:0 28px 96px}
+.prose{max-width:66ch}
+h1,h2,h3,h4{font-family:var(--f-display); font-weight:700; text-wrap:balance; margin:0; line-height:1.15}
+p{margin:0 0 1.05em}
+a{color:var(--accent)}
+strong{font-weight:600; color:var(--ink)}
+
+/* ---------- masthead ---------- */
+.mast{padding:76px 0 40px; border-bottom:1px solid var(--hair)}
+.kicker{
+  font-family:var(--f-display); font-size:11.5px; font-weight:600;
+  letter-spacing:.16em; text-transform:uppercase; color:var(--accent);
+  display:flex; align-items:center; gap:12px; margin-bottom:22px;
+}
+.kicker::after{content:""; height:1px; flex:1; background:var(--hair)}
+h1{font-size:clamp(34px,5.4vw,54px); letter-spacing:-.022em}
+.dek{font-size:20px; color:var(--ink-2); max-width:60ch; margin-top:20px}
+.meta{
+  display:flex; flex-wrap:wrap; gap:0; margin-top:34px;
+  border:1px solid var(--hair); border-radius:3px; background:var(--surface);
+  overflow:hidden;
+}
+.meta div{padding:12px 18px; border-right:1px solid var(--hair); flex:1 1 auto; min-width:150px}
+.meta div:last-child{border-right:0}
+.meta dt{
+  font-family:var(--f-display); font-size:10px; font-weight:600; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--muted); margin:0 0 4px;
+}
+.meta dd{margin:0; font-family:var(--f-display); font-size:14px; font-weight:500; color:var(--ink)}
+
+/* ---------- sections ---------- */
+section{padding-top:64px}
+.eyebrow{
+  font-family:var(--f-display); font-size:11.5px; font-weight:600; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--muted); margin-bottom:14px;
+}
+h2{font-size:clamp(24px,3vw,31px); letter-spacing:-.015em; margin-bottom:18px}
+h3{font-size:17px; letter-spacing:-.004em; margin-bottom:8px}
+.lede{font-size:19px; color:var(--ink-2)}
+
+/* ---------- stat tiles ---------- */
+.tiles{display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:14px; margin:26px 0 8px}
+.tile{background:var(--surface); border:1px solid var(--hair); border-radius:3px; padding:18px 20px; box-shadow:var(--shadow)}
+.tile .n{font-family:var(--f-mono); font-weight:700; font-size:34px; letter-spacing:-.03em; font-variant-numeric:tabular-nums; display:block; line-height:1.05}
+.tile .l{font-family:var(--f-display); font-size:12px; font-weight:600; letter-spacing:.05em; margin-top:8px; color:var(--ink-2)}
+.tile .s{font-size:14px; color:var(--muted); margin-top:5px; line-height:1.45}
+
+/* ---------- tables ---------- */
+.scroll{overflow-x:auto; margin:24px 0; border:1px solid var(--hair); border-radius:3px; background:var(--surface)}
+table{border-collapse:collapse; width:100%; font-family:var(--f-display); font-size:14px; min-width:640px}
+th{
+  text-align:left; font-size:10.5px; font-weight:600; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--muted); padding:12px 16px; border-bottom:1px solid var(--hair); white-space:nowrap;
+}
+td{padding:13px 16px; border-bottom:1px solid var(--hair); vertical-align:top; color:var(--ink-2)}
+tbody tr:last-child td{border-bottom:0}
+td.num,th.num{font-family:var(--f-mono); font-variant-numeric:tabular-nums; text-align:right; white-space:nowrap}
+th.num{text-align:right}
+td.name{color:var(--ink); font-weight:600; white-space:nowrap}
+.wtrack{height:5px; border-radius:3px; background:var(--surface-2); min-width:96px; margin-top:8px; overflow:hidden}
+.wtrack span{display:block; height:100%; border-radius:3px; background:var(--accent)}
+
+/* ---------- tier chips ---------- */
+.chip{
+  display:inline-block; font-family:var(--f-display); font-size:11.5px; font-weight:700;
+  letter-spacing:.07em; text-transform:uppercase; padding:4px 9px; border-radius:2px; white-space:nowrap;
+}
+.c1{background:var(--t1-bg); color:var(--t1)} .c2{background:var(--t2-bg); color:var(--t2)}
+.c3{background:var(--t3-bg); color:var(--t3)} .c4{background:var(--t4-bg); color:var(--t4)}
+
+/* ---------- scorer ---------- */
+.scorer{
+  display:grid; grid-template-columns:1.15fr .85fr; gap:0; margin-top:28px;
+  border:1px solid var(--hair); border-radius:3px; background:var(--surface);
+  box-shadow:var(--shadow); overflow:hidden;
+}
+.inputs{padding:24px 26px; border-right:1px solid var(--hair)}
+.verdict{padding:24px 26px; background:var(--surface-2)}
+.panel-h{
+  font-family:var(--f-display); font-size:10.5px; font-weight:600; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--muted); margin-bottom:18px;
+}
+.fld{margin-bottom:19px}
+.fld:last-child{margin-bottom:4px}
+.fld-top{display:flex; justify-content:space-between; align-items:baseline; gap:12px}
+.fld label{font-family:var(--f-display); font-size:14px; font-weight:600; color:var(--ink)}
+.fld .wt{font-family:var(--f-mono); font-size:11.5px; color:var(--muted); font-variant-numeric:tabular-nums}
+.fld .anchor{font-family:var(--f-display); font-size:12.5px; color:var(--muted); margin-top:3px; line-height:1.4; min-height:2.6em; display:block}
+input[type=range]{
+  -webkit-appearance:none; appearance:none; width:100%; height:22px; background:transparent; margin:4px 0 0; cursor:grab;
+}
+input[type=range]::-webkit-slider-runnable-track{height:4px; border-radius:2px; background:var(--hair)}
+input[type=range]::-moz-range-track{height:4px; border-radius:2px; background:var(--hair)}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none; width:16px; height:16px; border-radius:50%; background:var(--accent);
+  border:2px solid var(--surface); margin-top:-6px; box-shadow:0 0 0 1px var(--accent);
+}
+input[type=range]::-moz-range-thumb{
+  width:14px; height:14px; border-radius:50%; background:var(--accent);
+  border:2px solid var(--surface); box-shadow:0 0 0 1px var(--accent);
+}
+input[type=range]:focus-visible{outline:2px solid var(--accent); outline-offset:4px; border-radius:3px}
+.scale{display:flex; justify-content:space-between; font-family:var(--f-mono); font-size:10px; color:var(--muted); margin-top:1px}
+
+.score-hero{display:flex; align-items:flex-end; gap:14px; margin-bottom:6px}
+#score{font-family:var(--f-mono); font-weight:700; font-size:52px; line-height:.9; letter-spacing:-.04em; font-variant-numeric:tabular-nums}
+.score-hero .of{font-family:var(--f-mono); font-size:14px; color:var(--muted); padding-bottom:5px}
+.rungs{display:flex; gap:5px; margin:16px 0 0}
+.rungs i{height:7px; flex:1; border-radius:2px; background:var(--hair); transition:background .18s ease}
+#tierName{font-family:var(--f-display); font-size:20px; font-weight:700; margin:14px 0 2px}
+#tierSub{font-size:14.5px; color:var(--muted); margin-bottom:18px; font-family:var(--f-display)}
+.commit{border-top:1px solid var(--hair); padding-top:16px; margin-top:2px}
+.commit .n{font-family:var(--f-mono); font-weight:700; font-size:30px; font-variant-numeric:tabular-nums; letter-spacing:-.02em}
+.commit .u{font-family:var(--f-display); font-size:14px; color:var(--muted); margin-left:4px}
+.commit .cap{font-family:var(--f-display); font-size:10.5px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin-bottom:6px}
+.drivers{border-top:1px solid var(--hair); margin-top:20px; padding-top:16px}
+.drivers ol{margin:0; padding:0; list-style:none; counter-reset:d}
+.drivers li{
+  font-family:var(--f-display); font-size:13.5px; line-height:1.45; padding:9px 0;
+  border-bottom:1px dashed var(--hair); display:flex; gap:10px; align-items:baseline;
+}
+.drivers li:last-child{border-bottom:0}
+.drivers .rank{font-family:var(--f-mono); font-size:11px; color:var(--muted); flex:0 0 auto}
+.drivers .txt{color:var(--ink-2)}
+.drivers .txt b{display:block; color:var(--ink); font-weight:600; margin-bottom:1px}
+.posture{margin-top:20px; border-top:1px solid var(--hair); padding-top:16px}
+.posture ul{margin:0; padding-left:17px; font-family:var(--f-display); font-size:13.5px; line-height:1.5; color:var(--ink-2)}
+.posture li{margin-bottom:6px}
+
+/* ---------- chart ---------- */
+.chartwrap{margin:26px 0 10px; background:var(--surface); border:1px solid var(--hair); border-radius:3px; padding:22px 20px 14px; box-shadow:var(--shadow); overflow-x:auto}
+.chartwrap svg{display:block; min-width:560px; width:100%; height:auto}
+.legend{display:flex; flex-wrap:wrap; gap:16px; margin-top:14px; font-family:var(--f-display); font-size:12px; color:var(--muted)}
+.legend span{display:flex; align-items:center; gap:6px}
+.legend i{width:9px; height:9px; border-radius:50%; display:inline-block}
+.axlabel{font-family:var(--f-display); font-size:10.5px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; fill:var(--muted)}
+.tickt{font-family:var(--f-mono); font-size:10.5px; fill:var(--muted)}
+
+/* ---------- callouts ---------- */
+.note{
+  border-left:2px solid var(--accent); background:var(--accent-soft);
+  padding:16px 20px; margin:24px 0; border-radius:0 3px 3px 0;
+}
+.note p:last-child{margin-bottom:0}
+.note .h{font-family:var(--f-display); font-size:11px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); margin-bottom:7px}
+.warn{border-left-color:var(--t3); background:var(--t3-bg)}
+.warn .h{color:var(--t3)}
+
+.cols{display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:22px; margin-top:24px}
+.cols h3{font-family:var(--f-display)}
+.cols p{font-size:15.5px; color:var(--ink-2); margin-bottom:0}
+
+hr.rule{border:0; border-top:1px solid var(--hair); margin:0}
+
+footer{margin-top:70px; padding-top:26px; border-top:1px solid var(--hair); font-family:var(--f-display); font-size:13.5px; color:var(--muted)}
+footer p{max-width:70ch}
+footer a{color:var(--accent); text-decoration-color:var(--hair); text-underline-offset:3px}
+
+@media (max-width:860px){
+  .scorer{grid-template-columns:1fr}
+  .inputs{border-right:0; border-bottom:1px solid var(--hair)}
+  body{font-size:16.5px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important; transition:none!important}}
+</style>
+<style>html{-webkit-text-size-adjust:100%}img{max-width:100%}</style>
+</head>
+<body>
+<div style="max-width:1100px;margin:0 auto;padding:0 24px"><a href="/" style="display:inline-block;font:500 11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.09em;text-transform:uppercase;color:var(--accent,#666);text-decoration:none;border-bottom:1px solid transparent;padding:14px 0 0 0" onmouseover="this.style.borderBottomColor='currentColor'" onmouseout="this.style.borderBottomColor='transparent'">&larr; Jason Santos, portfolio</a></div>
+
+
+<div class="shell">
+
+<header class="mast">
+  <div class="kicker">Delivery operations &middot; Decision system</div>
+  <h1>Implementation Risk Ladder</h1>
+  <p class="dek">A scoring model that sets the go-live commitment at kickoff, when changing it is still cheap, instead of at week twelve, when it is not.</p>
+  <dl class="meta">
+    <div><dt>Built by</dt><dd>Jason Santos</dd></div>
+    <div><dt>Origin</dt><dd>Wintrust onboarding framework</dd></div>
+    <div><dt>Domain fit</dt><dd>Enterprise SaaS onboarding</dd></div>
+    <div><dt>Cohort data</dt><dd>Simulated, not observed</dd></div>
+  </dl>
+</header>
+
+<section>
+  <div class="eyebrow">The problem</div>
+  <h2>A single standard timeline is wrong in both directions</h2>
+  <div class="prose">
+    <p class="lede">Most implementation orgs quote one number. Twelve weeks, ninety days, one quarter. It is a reasonable-sounding promise and it is almost never the right one for the account in front of you.</p>
+    <p>The failure is not that the number is too aggressive. It is that a fixed number carries no information about the account. A three-facility regional shipper with one TMS and clean location data finishes early, and the org spent twelve weeks of delivery capacity on something that needed eight. A global manufacturer with four hundred carriers, two ERPs mid-migration, and no documented exception process blows through week twelve and then keeps going, and the conversation about why happens in front of the executive sponsor.</p>
+    <p>Both outcomes are expensive. The second is worse, because a missed go-live date is not just a schedule event; it is the moment the customer starts recalculating whether they believe anything else you told them.</p>
+  </div>
+
+  <div class="tiles">
+    <div class="tile">
+      <span class="n" style="color:var(--t4)">19%</span>
+      <div class="l">Hit rate on a flat 12-week promise</div>
+      <div class="s">Four out of five accounts miss the committed date.</div>
+    </div>
+    <div class="tile">
+      <span class="n" style="color:var(--t3)">7.3</span>
+      <div class="l">Mean weeks late, when late</div>
+      <div class="s">And the overrun is right-skewed; the worst cases are far worse than the average.</div>
+    </div>
+    <div class="tile">
+      <span class="n" style="color:var(--t2)">21</span>
+      <div class="l">Weeks you must quote to hit 73%</div>
+      <div class="s">Padding the standard promise works, but you now over-quote every simple account by a full quarter.</div>
+    </div>
+  </div>
+  <p style="font-family:var(--f-display); font-size:13px; color:var(--muted); margin-top:10px">Figures from the simulated cohort described in <a href="#validation">Calibration</a>. They are illustrative of the mechanism, not measurements of any real delivery org.</p>
+</section>
+
+<section>
+  <div class="eyebrow">The model</div>
+  <h2>Six factors, weighted by how little control you have over them</h2>
+  <div class="prose">
+    <p>The scoring inputs are not a checklist of everything that can go wrong. They are the six things that, at kickoff, are already knowable and already predictive. Each is scored 1 to 5, where 5 is the worst case, and combined into a weighted risk score.</p>
+    <p>The weighting principle is the part worth arguing about: <strong>a factor is weighted by how little the delivery team can do about it once the project starts.</strong> Integration complexity is heavy work but it is your work, and effort moves it. Carrier enablement is not your work; it is hundreds of third parties who have no contract with you and no deadline of their own. That is why it carries the largest weight despite being conceptually simpler than the integration build.</p>
+  </div>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Factor</th><th class="num">Weight</th><th>What a 5 looks like</th><th>Why it is weighted here</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="name">Carrier &amp; partner dependency<div class="wtrack"><span style="width:100%"></span></div></td>
+          <td class="num">0.24</td>
+          <td>Hundreds of carriers to enable across modes, many small and low-tech, none contractually obligated to you.</td>
+          <td>Entirely outside the delivery team's control. No amount of internal effort compresses it, which makes it the dominant source of schedule variance.</td>
+        </tr>
+        <tr>
+          <td class="name">Integration surface<div class="wtrack"><span style="width:92%"></span></div></td>
+          <td class="num">0.22</td>
+          <td>Multiple ERP and TMS instances, legacy EDI alongside modern APIs, no single system of record for shipments.</td>
+          <td>Heavy, but it is your team's work and it responds to staffing. Predictable effort, high volume.</td>
+        </tr>
+        <tr>
+          <td class="name">Reference data gap<div class="wtrack"><span style="width:75%"></span></div></td>
+          <td class="num">0.18</td>
+          <td>Facility master is stale, locations are unresolvable to coordinates, shipment identifiers are inconsistent between systems.</td>
+          <td>The quiet killer. Nothing visibly blocks until testing, when every match rate comes back wrong and the fix lives in the customer's data governance backlog.</td>
+        </tr>
+        <tr>
+          <td class="name">Process definition gap<div class="wtrack"><span style="width:58%"></span></div></td>
+          <td class="num">0.14</td>
+          <td>No documented exception handling today; the target-state process is being invented during the implementation.</td>
+          <td>The primary source of scope creep. Undefined process gets defined by whoever is loudest in the room that week.</td>
+        </tr>
+        <tr>
+          <td class="name">Stakeholder fragmentation<div class="wtrack"><span style="width:50%"></span></div></td>
+          <td class="num">0.12</td>
+          <td>IT, transportation, and the business units answer to different leaders; the executive sponsor is nominal.</td>
+          <td>Slows every decision, but a strong project manager genuinely mitigates it, so it earns less weight than its visibility suggests.</td>
+        </tr>
+        <tr>
+          <td class="name">Change absorption constraint<div class="wtrack"><span style="width:42%"></span></div></td>
+          <td class="num">0.10</td>
+          <td>Competing ERP program, peak-season freeze window, no dedicated customer-side project manager.</td>
+          <td>Real, but usually known in advance and schedulable around, which is what makes it the smallest weight rather than the largest.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note">
+    <div class="h">Where these weights came from</div>
+    <p>They are judgment-derived priors, not coefficients fitted to outcome data. I am stating that plainly because the alternative, presenting invented weights as empirical, is the thing that makes portfolio models worthless. <a href="#validation">Calibration</a> below covers how you would replace them with real ones and, more usefully, how much it would actually change the answer.</p>
+  </div>
+</section>
+
+<section>
+  <div class="eyebrow">The instrument</div>
+  <h2>Score an account</h2>
+  <p class="prose lede">Move the six inputs to match the account in front of you. The commitment, the delivery posture, and the ranked risk drivers update together.</p>
+
+  <div class="scorer">
+    <div class="inputs">
+      <div class="panel-h">Kickoff assessment</div>
+      <div id="fields"></div>
+    </div>
+    <div class="verdict">
+      <div class="panel-h">Verdict</div>
+      <div class="score-hero"><span id="score">0.00</span><span class="of">/ 5.00</span></div>
+      <div class="rungs" id="tierChip" role="img" aria-label="Tier ladder position"></div>
+      <div id="tierName">Tier</div>
+      <div id="tierSub">posture</div>
+
+      <div class="commit">
+        <div class="cap">Commit to the customer</div>
+        <span class="n" id="weeks">0</span><span class="u">weeks to go-live</span>
+      </div>
+
+      <div class="drivers">
+        <div class="cap panel-h" style="margin-bottom:10px">What is driving the score</div>
+        <ol id="drivers"></ol>
+      </div>
+
+      <div class="posture">
+        <div class="cap panel-h" style="margin-bottom:10px">Delivery posture</div>
+        <ul id="posture"></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="eyebrow">The ladder</div>
+  <h2>Four tiers, four different promises</h2>
+  <div class="prose">
+    <p>The tier is not a label for a status report. It determines the date sales is allowed to put in front of the customer, the staffing the project gets, and the governance cadence. If the tier does not change those three things, tiering is decoration.</p>
+  </div>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Tier</th><th class="num">Score</th><th class="num">Commit</th><th class="num">Median actual</th><th class="num">P90</th><th class="num">Share</th><th>Staffing and governance</th></tr></thead>
+      <tbody>
+        <tr><td><span class="chip c1">Tier 1 &middot; Standard</span></td><td class="num">&lt; 2.20</td><td class="num">10 wk</td><td class="num">8.6</td><td class="num">12.6</td><td class="num">12%</td><td>One implementation manager. Templated configuration, self-service training, weekly checkpoint. Escalate only on exception.</td></tr>
+        <tr><td><span class="chip c2">Tier 2 &middot; Managed</span></td><td class="num">2.20 &ndash; 3.00</td><td class="num">15 wk</td><td class="num">14.2</td><td class="num">18.4</td><td class="num">32%</td><td>Implementation manager plus solutions engineer. Carrier enablement runs in waves, not all at once. Biweekly steering with a named customer owner.</td></tr>
+        <tr><td><span class="chip c3">Tier 3 &middot; Complex</span></td><td class="num">3.00 &ndash; 3.80</td><td class="num">21 wk</td><td class="num">18.5</td><td class="num">23.8</td><td class="num">38%</td><td>Dedicated project manager. Phased go-live by region or mode. Executive steering committee from kickoff, with written change control.</td></tr>
+        <tr><td><span class="chip c4">Tier 4 &middot; Program</span></td><td class="num">&ge; 3.80</td><td class="num">28 wk</td><td class="num">24.7</td><td class="num">30.6</td><td class="num">19%</td><td>Run as a program, not a project. Data remediation completes as a gated pre-phase before the implementation clock starts. Formal governance and budget tracking.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note warn">
+    <div class="h">The rule that makes it work</div>
+    <p>The tier sets the committed date; the customer's preferred date does not. This is the entire mechanism, and it is the part that fails in practice, because overriding it is always locally rational. A deal is closing, the sponsor wants a number, and quoting Tier 1 to a Tier 4 account costs nothing today. It costs everything in month five. If the ladder can be overridden without a written exception and a named approver, it will be overridden, and you are back to quoting twelve weeks to everyone.</p>
+  </div>
+</section>
+
+<section id="validation">
+  <div class="eyebrow">Calibration</div>
+  <h2>How you would know whether this works</h2>
+  <div class="prose">
+    <p>The honest position on a model like this is that it is a hypothesis until it has seen outcomes. What follows is the method for testing it, run against a simulated cohort of 480 implementations so the procedure is visible. <strong>The cohort is generated, not observed.</strong> It is here to show what a validation would look like and to answer one question that does not require real data.</p>
+    <p>In a real deployment the steps are: score every project at kickoff and freeze the score; record actual weeks to go-live; set each tier's commitment at the tier's historical 75th percentile; then check quarterly whether the tiers still separate and whether any factor has stopped carrying signal.</p>
+  </div>
+
+  <div class="chartwrap">
+    <svg id="scatter" viewBox="0 0 720 340" role="img" aria-label="Scatter plot of risk score against actual weeks to go-live, with tier commitment steps overlaid."></svg>
+    <div class="legend">
+      <span><i style="background:var(--t1)"></i>Tier 1</span>
+      <span><i style="background:var(--t2)"></i>Tier 2</span>
+      <span><i style="background:var(--t3)"></i>Tier 3</span>
+      <span><i style="background:var(--t4)"></i>Tier 4</span>
+      <span><i style="background:var(--ink);border-radius:0;height:2px;width:16px"></i>Tier commitment (p75)</span>
+    </div>
+  </div>
+
+  <h3 style="margin-top:34px">Tiering versus the two things orgs actually do instead</h3>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Commitment policy</th><th class="num">Avg quoted</th><th class="num">Hit rate</th><th class="num">Weeks late, when late</th><th class="num">Weeks early, when early</th><th class="num">Mean error</th></tr></thead>
+      <tbody>
+        <tr><td class="name">Flat 12 weeks</td><td class="num">12.0</td><td class="num">19.0%</td><td class="num">7.3</td><td class="num">2.8</td><td class="num">6.5</td></tr>
+        <tr><td class="name">Flat 21 weeks (padded)</td><td class="num">21.0</td><td class="num">73.1%</td><td class="num">4.3</td><td class="num">6.5</td><td class="num">5.9</td></tr>
+        <tr><td class="name" style="color:var(--accent)">Tiered ladder</td><td class="num">19.2</td><td class="num">68.8%</td><td class="num">2.7</td><td class="num">3.8</td><td class="num">3.4</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="prose">
+    <p>The result worth reading carefully is that <strong>the ladder does not win on hit rate.</strong> Padding the standard promise to twenty-one weeks hits slightly more often. If hit rate is the metric, padding is the answer, and it takes about ten seconds of thought.</p>
+    <p>The ladder wins on precision. It reaches roughly the same reliability while quoting nearly two weeks less on average, cutting the miss from 4.3 weeks to 2.7 and the mean error almost in half. That is the case for it: you are not buying a higher hit rate, you are buying the ability to promise a short timeline to the accounts that deserve one without lying to the accounts that do not. Padding gives up every simple account to protect the complex ones.</p>
+  </div>
+
+  <div class="note">
+    <div class="h">The robustness question</div>
+    <p>Since the weights are priors, the fair objection is that they are wrong. So the simulation was built with a deliberately different set of true weights than the model uses, plus a compounding interaction the model does not model at all. Under that mismatch the model's score still correlates with actual duration at <strong>0.836</strong>, against <strong>0.849</strong> for the true weights. Approximately-right weights recover about 98% of the achievable ranking signal.</p>
+    <p style="margin-bottom:0">That is the practical finding, and it holds outside the simulation: for a tiering decision you need the factors and their rough order of importance to be right. Precision in the third decimal of a weight buys almost nothing, which means the work belongs in choosing what to measure, not in tuning what you already measure.</p>
+  </div>
+</section>
+
+<section>
+  <div class="eyebrow">Limits</div>
+  <h2>What this is not</h2>
+  <div class="cols">
+    <div>
+      <h3>Not validated</h3>
+      <p>No real implementation outcomes have been scored against it. Every number on this page comes from a simulation whose generating process I wrote. It demonstrates a method; it does not prove a result.</p>
+    </div>
+    <div>
+      <h3>Not a replacement for judgment</h3>
+      <p>A score of 3.1 and a score of 2.9 are the same account. The tier boundary is a convention for making a decision, not a discovered natural break, and a delivery lead should be able to move an account across it with a written reason.</p>
+    </div>
+    <div>
+      <h3>Not domain-proven</h3>
+      <p>The factors are built on how enterprise onboarding fails generally, and on supply chain visibility as I understand it from outside. Someone who has run these implementations would sharpen the anchors and probably add a seventh factor I cannot see.</p>
+    </div>
+    <div>
+      <h3>Not self-enforcing</h3>
+      <p>The model is the easy part. The hard part is an organization agreeing that a tier can override a sales commitment, and holding to it in the quarter where it costs a deal.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="eyebrow">Provenance</div>
+  <h2>Where this came from</h2>
+  <div class="prose">
+    <p>At Wintrust Financial I managed 75 to 100 concurrent agency relationships on a $200M premium finance portfolio, onboarding new clients onto the platform those relationships ran on. Onboarding had no standard timeline; every new agency got the same rough promise and roughly half of them took twice as long, usually for reasons that were visible on day one and simply were not being written down.</p>
+    <p>I built a tiered onboarding framework that segmented incoming clients by operational complexity and assigned a timeline to the tier rather than to the client's preference. Ramp time went from six to eight weeks down to three, and the organization adopted the framework as its standard playbook.</p>
+    <p style="margin-bottom:0">This page is that idea rebuilt for a different problem. The domain is different, the factors are different, and the stakes per project are an order of magnitude larger. The mechanism is the same one: move the argument about the date to the moment when changing the date is still free.</p>
+  </div>
+</section>
+
+<footer>
+  <p><strong style="color:var(--ink)">Jason Santos</strong> &middot; Schaumburg, IL &middot; <a href="mailto:santos.jason21@gmail.com">santos.jason21@gmail.com</a> &middot; <a href="https://linkedin.com/in/jasonsantos21">linkedin.com/in/jasonsantos21</a></p>
+  <p style="margin-top:10px">Built as a portfolio piece for enterprise implementation roles. Cohort data is simulated and labeled as such throughout. Model logic, weights, and the validation procedure are my own.</p>
+</footer>
+
+</div>
+
+<script>
+(function(){
+  var FACTORS=[
+    {k:"carrier",n:"Carrier & partner dependency",w:.24,
+     a:["Single carrier, already integrated","A handful of large carriers with existing feeds","Dozens of carriers, mixed sophistication","Hundreds of carriers across modes","Hundreds of carriers, many small and low-tech, no leverage over them"],
+     m:"Sequence carrier enablement in waves by shipment volume and go live on the first wave. Do not gate go-live on the long tail; put a named customer-side owner on carrier outreach in week one."},
+    {k:"integration",n:"Integration surface",w:.22,
+     a:["One modern system with a documented API","One ERP or TMS, standard connector","Two or three systems, some legacy EDI","Multiple instances plus custom middleware","Several ERPs mid-migration, legacy EDI, no system of record"],
+     m:"Freeze integration scope in writing before build starts and stage the connections; land the system of record first and treat everything after it as a follow-on release, not a go-live dependency."},
+    {k:"data",n:"Reference data gap",w:.18,
+     a:["Clean, current, single master","Minor gaps, known and owned","Stale in places, no clear owner","Significant gaps, inconsistent identifiers","Unresolvable locations, conflicting identifiers, no governance"],
+     m:"Run a data assessment before kickoff and report match rates to the sponsor in week two. On a Tier 4 account, make remediation a gated pre-phase; the implementation clock should not start until it clears."},
+    {k:"process",n:"Process definition gap",w:.14,
+     a:["Documented and stable","Documented, minor rework expected","Partly documented, gaps in exceptions","Largely undocumented","Target state is being invented during the project"],
+     m:"Run design workshops before configuration and get the exception-handling process signed. Every change after sign-off goes through written change control with a schedule impact attached."},
+    {k:"stakeholder",n:"Stakeholder fragmentation",w:.12,
+     a:["One sponsor, one decision maker","Aligned leadership, single reporting line","Two or three groups, generally cooperative","Separate leaders, competing priorities","Nominal sponsor, no one able to decide across groups"],
+     m:"Get a real sponsor with budget authority, not a nominal one, and stand up a steering committee at kickoff. Escalate decision latency as a schedule risk in writing the first time it happens."},
+    {k:"change",n:"Change absorption constraint",w:.10,
+     a:["Dedicated customer PM, clear runway","Named PM, some competing work","Part-time PM, one competing program","No dedicated PM, major competing program","No PM, ERP program in flight, peak-season freeze"],
+     m:"Schedule around the freeze window rather than through it, and make a named customer-side project manager a condition of the timeline. Without one, quote the next tier up."}
+  ];
+  var TIERS=[
+    {n:"Tier 1 · Standard",c:"c1",w:10,col:"--t1",sub:"Templated delivery, weekly checkpoint",
+     p:["One implementation manager, no dedicated PM","Standard configuration package and self-service training","Weekly checkpoint; escalate only on exception","Single go-live, no phasing"]},
+    {n:"Tier 2 · Managed",c:"c2",w:15,col:"--t2",sub:"Staged enablement, biweekly steering",
+     p:["Implementation manager plus solutions engineer","Carrier enablement runs in waves, not all at once","Biweekly steering with a named customer owner","Go-live gated on wave one, not the full network"]},
+    {n:"Tier 3 · Complex",c:"c3",w:21,col:"--t3",sub:"Dedicated PM, phased go-live, formal change control",
+     p:["Dedicated project manager from kickoff","Phased go-live by region or transportation mode","Executive steering committee, written change control","Data assessment reported to the sponsor by week two"]},
+    {n:"Tier 4 · Program",c:"c4",w:28,col:"--t4",sub:"Run as a program; gated data pre-phase",
+     p:["Program structure, not a single project plan","Data remediation as a gated pre-phase before the clock starts","Formal governance, budget tracking, monthly executive review","Go-live readiness reviewed against explicit exit criteria"]}
+  ];
+  var state=FACTORS.map(function(){return 3;});
+
+  var fw=document.getElementById('fields');
+  FACTORS.forEach(function(f,i){
+    var d=document.createElement('div'); d.className='fld';
+    d.innerHTML='<div class="fld-top"><label for="r'+i+'">'+f.n+'</label><span class="wt">w '+f.w.toFixed(2)+'</span></div>'+
+      '<input id="r'+i+'" type="range" min="1" max="5" step="1" value="3" aria-describedby="a'+i+'">'+
+      '<span class="anchor" id="a'+i+'">'+f.a[2]+'</span>'+
+      '<div class="scale"><span>1 low</span><span>5 high</span></div>';
+    fw.appendChild(d);
+    d.querySelector('input').addEventListener('input',function(e){
+      state[i]=+e.target.value;
+      document.getElementById('a'+i).textContent=f.a[state[i]-1];
+      render();
+    });
+  });
+
+  function render(){
+    var s=0; FACTORS.forEach(function(f,i){s+=f.w*state[i];});
+    var t = s<2.2?0 : s<3.0?1 : s<3.8?2 : 3;
+    var T=TIERS[t];
+    document.getElementById('score').textContent=s.toFixed(2);
+    document.getElementById('score').style.color='var('+T.col+')';
+    var rung=''; for(var r=0;r<4;r++){ rung+='<i style="background:'+(r<=t?'var('+T.col+')':'var(--hair)')+'"></i>'; }
+    var tc=document.getElementById('tierChip');
+    tc.innerHTML=rung; tc.setAttribute('aria-label','Tier '+(t+1)+' of 4');
+    document.getElementById('tierName').textContent=T.n;
+    document.getElementById('tierSub').textContent=T.sub;
+    document.getElementById('weeks').textContent=T.w;
+    document.getElementById('weeks').style.color='var('+T.col+')';
+
+    var ranked=FACTORS.map(function(f,i){return {f:f,c:f.w*(state[i]-1),v:state[i]};})
+      .filter(function(x){return x.c>0;})
+      .sort(function(a,b){return b.c-a.c;}).slice(0,3);
+    var ol=document.getElementById('drivers');
+    if(!ranked.length){ ol.innerHTML='<li><span class="txt">Every factor scored at the floor. Nothing is adding risk above baseline.</span></li>'; }
+    else{
+      ol.innerHTML=ranked.map(function(x,j){
+        return '<li><span class="rank">'+(j+1)+'</span><span class="txt"><b>'+x.f.n+' &middot; scored '+x.v+'</b>'+x.f.m+'</span></li>';
+      }).join('');
+    }
+    document.getElementById('posture').innerHTML=T.p.map(function(p){return '<li>'+p+'</li>';}).join('');
+  }
+  render();
+
+  // ---- scatter ----
+  var PTS=[[2.34,10.7,1],[2.3,8.4,1],[3.58,15.3,2],[2.44,10.6,1],[3.56,20.5,2],[3.3,21.9,2],[2.22,13.3,1],[3.48,20.1,2],[2.76,17.3,1],[2.48,15.6,1],[3.48,15.2,2],[4.02,20.9,3],[3.7,18.7,2],[3.6,24.1,2],[2.14,15.3,0],[1.92,11.8,0],[3.02,17.1,2],[2.46,12.5,1],[3.88,23.4,3],[2.24,10.8,1],[3.32,15.4,2],[2.34,10.1,1],[3.52,19.1,2],[4.0,35.3,3],[3.26,20.4,2],[3.78,30.9,2],[4.4,23.9,3],[2.84,17.5,1],[1.54,6.8,0],[3.88,19.6,3],[3.44,20.8,2],[3.56,18.3,2],[3.92,15.7,3],[2.52,15.2,1],[2.78,12.9,1],[3.82,22.0,3],[2.46,13.5,1],[4.24,18.6,3],[2.5,16.9,1],[3.48,16.2,2],[3.64,14.4,2],[2.56,14.2,1],[4.16,21.2,3],[3.74,18.1,2],[2.06,8.7,0],[2.48,12.4,1],[4.42,25.0,3],[3.44,14.7,2],[3.18,10.8,2],[3.1,13.5,2],[2.9,16.8,1],[2.44,14.3,1],[2.9,14.4,1],[3.06,19.8,2],[2.14,13.6,0],[1.84,7.9,0],[3.22,20.2,2],[2.9,17.6,1],[2.38,12.5,1],[3.62,15.3,2],[4.08,24.6,3],[2.36,9.7,1],[3.42,15.7,2],[3.24,20.9,2],[3.66,16.1,2],[2.08,7.9,0],[2.84,15.4,1],[3.58,18.3,2],[3.5,14.2,2],[3.18,15.5,2],[2.54,14.5,1],[3.22,15.8,2],[4.46,29.3,3],[2.92,23.5,1],[4.38,29.0,3],[4.4,21.6,3],[2.08,14.5,0],[4.2,25.2,3],[2.34,11.4,1],[3.7,31.0,2],[3.56,17.6,2],[2.04,7.3,0],[3.42,17.1,2],[2.94,14.3,1],[2.88,16.5,1],[2.96,20.9,1],[2.04,10.6,0],[4.04,19.1,3],[3.4,18.9,2],[4.26,20.9,3],[3.56,25.2,2],[1.56,7.1,0],[3.16,17.0,2],[3.88,16.9,3],[2.52,17.6,1],[2.22,14.3,1],[3.68,24.6,2],[2.06,10.2,0],[3.8,23.6,3],[3.92,23.0,3],[3.14,23.1,2],[3.14,21.2,2],[3.04,30.8,2],[2.86,11.6,1],[2.76,12.7,1],[4.1,28.1,3],[1.66,7.0,0],[3.46,17.7,2],[1.52,5.5,0],[3.06,14.8,2],[3.78,19.7,2],[4.04,25.6,3],[3.24,21.7,2],[3.48,19.7,2],[2.9,17.0,1],[2.86,12.3,1],[3.32,16.0,2],[2.42,12.4,1],[2.98,21.6,1],[2.34,11.4,1],[2.78,14.9,1],[4.6,29.4,3],[2.02,10.2,0],[4.74,40.6,3],[4.06,24.7,3],[3.44,21.4,2],[2.54,17.4,1],[3.02,21.2,2],[3.04,16.7,2],[2.46,8.9,1],[2.92,14.2,1],[3.86,21.9,3],[3.88,21.4,3],[3.44,20.0,2],[2.66,18.4,1],[1.14,3.9,0],[3.12,15.3,2],[3.54,22.5,2],[4.32,27.1,3],[3.54,15.4,2],[1.72,7.0,0],[3.08,15.8,2],[2.88,18.8,1],[3.66,22.4,2],[4.62,28.7,3],[3.14,14.8,2],[4.48,21.7,3],[1.92,10.1,0],[3.54,23.1,2],[2.54,16.2,1],[4.0,18.0,3],[2.9,12.0,1],[2.76,13.5,1],[3.52,20.5,2],[3.4,17.1,2],[2.72,14.8,1],[4.12,34.0,3],[2.5,15.4,1],[3.88,25.7,3],[3.52,26.6,2]];
+  var W=720,H=340,L=52,R=14,Tp=14,B=44;
+  var x=function(v){return L+(v-1)/(5-1)*(W-L-R);};
+  var y=function(v){return H-B-(v/44)*(H-B-Tp);};
+  var COLS=['--t1','--t2','--t3','--t4'], CUT=[2.2,3.0,3.8], CW=[10,15,21,28];
+  var o=[];
+  // grid
+  [0,10,20,30,40].forEach(function(v){
+    o.push('<line x1="'+L+'" x2="'+(W-R)+'" y1="'+y(v).toFixed(1)+'" y2="'+y(v).toFixed(1)+'" stroke="var(--hair)" stroke-width="1"/>');
+    o.push('<text class="tickt" x="'+(L-9)+'" y="'+(y(v)+3.5).toFixed(1)+'" text-anchor="end">'+v+'</text>');
+  });
+  // tier boundaries
+  CUT.forEach(function(c){
+    o.push('<line x1="'+x(c).toFixed(1)+'" x2="'+x(c).toFixed(1)+'" y1="'+Tp+'" y2="'+(H-B)+'" stroke="var(--hair)" stroke-width="1" stroke-dasharray="3 4"/>');
+  });
+  // x ticks
+  [1,2,3,4,5].forEach(function(v){
+    o.push('<text class="tickt" x="'+x(v).toFixed(1)+'" y="'+(H-B+18)+'" text-anchor="middle">'+v.toFixed(1)+'</text>');
+  });
+  // points
+  PTS.forEach(function(p){
+    o.push('<circle cx="'+x(p[0]).toFixed(1)+'" cy="'+y(p[1]).toFixed(1)+'" r="3.4" fill="var('+COLS[p[2]]+')" fill-opacity=".62"/>');
+  });
+  // commitment steps
+  var edges=[1,2.2,3.0,3.8,5];
+  for(var i=0;i<4;i++){
+    o.push('<line x1="'+x(edges[i]).toFixed(1)+'" x2="'+x(edges[i+1]).toFixed(1)+'" y1="'+y(CW[i]).toFixed(1)+'" y2="'+y(CW[i]).toFixed(1)+'" stroke="var(--ink)" stroke-width="2.2" stroke-linecap="square"/>');
+    o.push('<text class="tickt" x="'+(x(edges[i])+6).toFixed(1)+'" y="'+(y(CW[i])-8).toFixed(1)+'" text-anchor="start" fill="var(--ink)" font-weight="700">'+CW[i]+'w commit</text>');
+  }
+  o.push('<text class="axlabel" x="'+L+'" y="'+(H-6)+'">Risk score &rarr;</text>');
+  o.push('<text class="axlabel" transform="translate(13,'+(H-B)+') rotate(-90)">Actual weeks to go-live &rarr;</text>');
+  document.getElementById('scatter').innerHTML=o.join('');
+})();
+</script>
+</body>
+</html>
