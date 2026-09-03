@@ -1,0 +1,748 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="A four-stage model for enterprise AI intake and acceptance: scoring use cases on the cost of proving they work, sizing acceptance criteria from confidence bounds, and blocking release when the sample cannot support the claim. Portfolio case study by Jason Santos.">
+<meta name="author" content="Jason Santos">
+<meta property="og:title" content="Testing a System That Guesses">
+<meta property="og:description" content="Why a requirement that says the system shall be accurate cannot fail an acceptance test, and a working model that fixes it.">
+<meta property="og:type" content="article">
+<title>Testing a System That Guesses</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap">
+
+<style>
+  :root {
+    --ground: #f6f4f3;
+    --surface: #fffefd;
+    --surface-sunk: #efeceb;
+    --ink: #1c1719;
+    --ink-soft: #4b4245;
+    --muted: #6f6568;
+    --rule: #e0d9d8;
+    --rule-strong: #c9c0be;
+    --accent: #7a2634;
+    --accent-soft: #f2e5e5;
+    --pass: #3d6b52;
+    --pass-soft: #e4eee8;
+    --warn: #8a6612;
+    --warn-soft: #f4ecd9;
+
+    --display: "Newsreader", ui-serif, Georgia, serif;
+    --body: "Source Sans 3", ui-sans-serif, system-ui, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+    --measure: 66ch;
+    --rail: 3.25rem;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #191617;
+      --surface: #211d1e;
+      --surface-sunk: #151213;
+      --ink: #ece7e5;
+      --ink-soft: #cbc2c0;
+      --muted: #9c9294;
+      --rule: #332d2e;
+      --rule-strong: #4a4243;
+      --accent: #cf7b86;
+      --accent-soft: #332326;
+      --pass: #7fb392;
+      --pass-soft: #1e2a23;
+      --warn: #cfa441;
+      --warn-soft: #2b2418;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground: #191617;
+    --surface: #211d1e;
+    --surface-sunk: #151213;
+    --ink: #ece7e5;
+    --ink-soft: #cbc2c0;
+    --muted: #9c9294;
+    --rule: #332d2e;
+    --rule-strong: #4a4243;
+    --accent: #cf7b86;
+    --accent-soft: #332326;
+    --pass: #7fb392;
+    --pass-soft: #1e2a23;
+    --warn: #cfa441;
+    --warn-soft: #2b2418;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 17px;
+    line-height: 1.62;
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 78rem;
+    margin: 0 auto;
+    padding: 3.5rem 1.5rem 6rem;
+  }
+
+  .col {
+    max-width: var(--measure);
+    margin-left: var(--rail);
+  }
+
+  @media (max-width: 46rem) {
+    :root { --rail: 0rem; }
+    body { font-size: 16px; }
+    .page { padding: 2.25rem 1.15rem 4rem; }
+  }
+
+  /* ---- masthead ---- */
+
+  .home {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    margin-bottom: 1.5rem;
+  }
+  .home:hover { border-bottom-color: currentColor; }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 1.4rem;
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-weight: 500;
+    font-size: clamp(2.6rem, 6.5vw, 4.1rem);
+    line-height: 1.02;
+    letter-spacing: -0.022em;
+    text-wrap: balance;
+    margin: 0 0 1.1rem;
+  }
+
+  .standfirst {
+    font-family: var(--display);
+    font-size: clamp(1.13rem, 2.2vw, 1.35rem);
+    line-height: 1.5;
+    color: var(--ink-soft);
+    margin: 0 0 2.2rem;
+    max-width: 34em;
+  }
+
+  .byline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem 1.35rem;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    padding: 0.9rem 0;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+  .byline a { color: var(--accent); text-decoration: none; border-bottom: 1px solid currentColor; }
+  .byline a:hover { color: var(--ink); }
+
+  /* ---- sections ---- */
+
+  section { margin-top: 3.6rem; }
+
+  h2 {
+    font-family: var(--display);
+    font-weight: 500;
+    font-size: 1.85rem;
+    line-height: 1.16;
+    letter-spacing: -0.012em;
+    margin: 0 0 1rem;
+    text-wrap: balance;
+    position: relative;
+  }
+
+  @media (min-width: 46.01rem) {
+    .staged h2::before {
+      content: attr(data-stage);
+      position: absolute;
+      left: calc(-1 * var(--rail));
+      top: 0.42em;
+      font-family: var(--mono);
+      font-size: 0.66rem;
+      letter-spacing: 0.06em;
+      color: var(--accent);
+      width: calc(var(--rail) - 0.9rem);
+      text-align: right;
+    }
+  }
+  @media (max-width: 46rem) {
+    .staged h2::before {
+      content: attr(data-stage) " · ";
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.06em;
+      color: var(--accent);
+    }
+  }
+
+  h3 {
+    font-family: var(--body);
+    font-weight: 600;
+    font-size: 0.79rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 2.4rem 0 0.7rem;
+  }
+
+  p { margin: 0 0 1.05rem; }
+  p:last-child { margin-bottom: 0; }
+
+  em { font-style: italic; }
+  strong { font-weight: 600; }
+
+  .lede-rule {
+    border: 0;
+    border-top: 2px solid var(--ink);
+    width: 2.5rem;
+    margin: 0 0 1.5rem;
+  }
+
+  code, .num {
+    font-family: var(--mono);
+    font-size: 0.87em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---- pull quote ---- */
+
+  .pull {
+    font-family: var(--display);
+    font-size: clamp(1.25rem, 2.8vw, 1.6rem);
+    line-height: 1.36;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    border-left: 3px solid var(--accent);
+    padding: 0.15rem 0 0.15rem 1.35rem;
+    margin: 2.2rem 0;
+    max-width: 30em;
+  }
+
+  /* ---- wide blocks ---- */
+
+  .wide {
+    max-width: 68rem;
+    margin-left: var(--rail);
+    margin-top: 1.9rem;
+    margin-bottom: 1.9rem;
+  }
+  .scroll { overflow-x: auto; }
+
+  figure { margin: 0; }
+  figcaption {
+    font-size: 0.83rem;
+    line-height: 1.5;
+    color: var(--muted);
+    margin-top: 0.85rem;
+    max-width: 52em;
+  }
+  figcaption b { color: var(--ink-soft); font-weight: 600; }
+
+  /* ---- chart panel ---- */
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 1.5rem 1.35rem 1.1rem;
+  }
+  .panel-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+    margin-bottom: 1.1rem;
+  }
+  .panel-title {
+    font-family: var(--body);
+    font-weight: 600;
+    font-size: 0.79rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 1rem;
+    font-family: var(--mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+  }
+  .legend span { display: inline-flex; align-items: center; gap: 0.4rem; }
+  .swatch { width: 11px; height: 11px; flex: none; }
+
+  svg { display: block; width: 100%; height: auto; }
+  .ax { font-family: "JetBrains Mono", monospace; font-size: 11px; fill: var(--muted); }
+  .rowlab { font-family: "JetBrains Mono", monospace; font-size: 12px; fill: var(--ink); }
+  .rowsub { font-family: "JetBrains Mono", monospace; font-size: 10px; fill: var(--muted); }
+  .valtag { font-family: "JetBrains Mono", monospace; font-size: 10.5px; }
+
+  /* ---- tables ---- */
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 0.85rem;
+    font-variant-numeric: tabular-nums;
+  }
+  caption {
+    caption-side: top;
+    text-align: left;
+    font-family: var(--body);
+    font-weight: 600;
+    font-size: 0.79rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding-bottom: 0.7rem;
+  }
+  th, td {
+    text-align: left;
+    padding: 0.52rem 0.85rem 0.52rem 0;
+    border-bottom: 1px solid var(--rule);
+    vertical-align: baseline;
+  }
+  thead th {
+    font-family: var(--mono);
+    font-weight: 500;
+    font-size: 0.67rem;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--rule-strong);
+    white-space: nowrap;
+  }
+  td.n, th.n { text-align: right; padding-right: 1.1rem; font-family: var(--mono); }
+  td.id { font-family: var(--mono); color: var(--muted); white-space: nowrap; }
+  tbody tr:last-child td { border-bottom: 0; }
+
+  .tag {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 0.63rem;
+    letter-spacing: 0.08em;
+    padding: 0.14rem 0.42rem;
+    white-space: nowrap;
+    border: 1px solid currentColor;
+  }
+  .t-build { color: var(--pass); background: var(--pass-soft); }
+  .t-pilot { color: var(--ink-soft); background: var(--surface-sunk); }
+  .t-reframe { color: var(--warn); background: var(--warn-soft); }
+  .t-decline { color: var(--accent); background: var(--accent-soft); }
+
+  /* ---- requirement cards ---- */
+
+  .reqs {
+    display: grid;
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    margin-top: 1.6rem;
+  }
+  .req {
+    background: var(--surface);
+    padding: 1.05rem 1.15rem;
+    display: grid;
+    grid-template-columns: 4.5rem 1fr;
+    gap: 0.35rem 1.1rem;
+    align-items: baseline;
+  }
+  @media (max-width: 34rem) {
+    .req { grid-template-columns: 1fr; }
+  }
+  .req-id {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+  }
+  .req-text { font-size: 0.95rem; line-height: 1.5; }
+  .req-verdict {
+    grid-column: 2;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--muted);
+  }
+  @media (max-width: 34rem) { .req-verdict { grid-column: 1; } }
+  .req-verdict b { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.07em; }
+  .v-untestable b { color: var(--accent); }
+  .v-statistical b { color: var(--pass); }
+  .v-deterministic b { color: var(--muted); }
+  .req.is-untestable { border-left: 3px solid var(--accent); }
+
+  /* ---- verdict block ---- */
+
+  .verdict {
+    margin-top: 1.9rem;
+    border: 1px solid var(--rule-strong);
+    background: var(--surface);
+    padding: 1.5rem 1.5rem 1.35rem;
+    max-width: 46rem;
+    margin-left: var(--rail);
+  }
+  .verdict-stamp {
+    font-family: var(--mono);
+    font-size: 1.5rem;
+    letter-spacing: 0.16em;
+    color: var(--accent);
+    border: 2px solid var(--accent);
+    display: inline-block;
+    padding: 0.25rem 0.85rem 0.2rem;
+    margin-bottom: 0.95rem;
+  }
+  .verdict p { font-size: 0.97rem; margin-bottom: 0.8rem; }
+
+  /* ---- footer ---- */
+
+  footer {
+    margin-top: 4.5rem;
+    padding-top: 1.4rem;
+    border-top: 1px solid var(--rule);
+    font-size: 0.85rem;
+    color: var(--muted);
+    max-width: 60rem;
+    margin-left: var(--rail);
+  }
+  footer p { margin-bottom: 0.7rem; }
+  footer a { color: var(--accent); }
+
+  a:focus-visible, [tabindex]:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+</style>
+<style>
+  html { -webkit-text-size-adjust: 100%; }
+  img { max-width: 100%; }
+  @media print {
+    :root {
+      --ground: #fff; --surface: #fff; --surface-sunk: #efeceb; --rail: 0;
+      --display: "Bitstream Charter", Charter, Georgia, serif;
+      --body: "Bitstream Charter", Charter, Georgia, serif;
+      --mono: "DejaVu Sans Mono", "Liberation Mono", monospace;
+    }
+    .ax, .rowlab, .rowsub, .valtag { font-family: "DejaVu Sans Mono", monospace; }
+    h3, .panel-title, caption, thead th, .skills dt { font-family: "Carlito", "Liberation Sans", sans-serif; }
+    body { font-size: 9.6pt; line-height: 1.42; }
+    .page { padding: 0; max-width: none; }
+    .home { display: none; }
+    .col, .wide, .verdict, footer { max-width: none; margin-left: 0; }
+    h1 { font-size: 26pt; margin-bottom: 8pt; }
+    .standfirst { font-size: 11.5pt; margin-bottom: 12pt; }
+    .byline { font-size: 7.4pt; padding: 6pt 0; }
+    section { margin-top: 16pt; }
+    h2 { font-size: 15pt; margin-bottom: 7pt; break-after: avoid; }
+    h2::before { display: none; }
+    h3 { margin: 13pt 0 4pt; font-size: 8pt; }
+    p { margin-bottom: 7pt; }
+    .pull { font-size: 12.5pt; margin: 12pt 0; }
+    .wide { margin: 12pt 0; }
+    table { font-size: 7.8pt; }
+    th, td { padding: 3pt 6pt 3pt 0; }
+    .reqs { margin-top: 10pt; }
+    .req { padding: 6pt 8pt; }
+    .req-text { font-size: 8.6pt; }
+    .req-verdict { font-size: 7.8pt; }
+    figcaption { font-size: 7.6pt; margin-top: 6pt; }
+    .panel { padding: 10pt 10pt 8pt; }
+    .verdict { padding: 12pt; margin-top: 12pt; }
+    .verdict-stamp { font-size: 13pt; margin-bottom: 7pt; }
+    footer { margin-top: 20pt; font-size: 7.8pt; }
+    .wide, .verdict, .panel, .reqs, table, figure { break-inside: avoid; }
+    tr, .req, .proj { break-inside: avoid; }
+    footer { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="col">
+    <a class="home" href="/">&larr; Jason Santos, portfolio</a>
+    <p class="eyebrow">Portfolio case study · Business systems analysis · AI</p>
+    <h1>Testing a System That Guesses</h1>
+    <p class="standfirst">A requirement that says "the system shall be accurate" cannot fail an acceptance test. This is a four-stage model that catches those requirements at intake, prices the evidence they need, and blocks release when the sample cannot support the claim.</p>
+    <div class="byline">
+      <span>Jason Santos</span>
+      <span>September 2026</span>
+      <span>Python 3.11, no dependencies</span>
+      <span>13 simulated use cases · 20 tests</span>
+    </div>
+  </header>
+
+  <section class="col">
+    <hr class="lede-rule">
+    <p>On conventional software, a requirement implies its own test. "The system shall prevent submission when the effective date precedes the contract date" is one test case. It passes or it does not, and two reviewers looking at the same result will agree on which.</p>
+    <p>That relationship breaks on a system whose output is a probability distribution. "The system shall extract payment terms accurately" implies nothing. The problem is not that the test is hard to write. It is that no observation could falsify the sentence, so two reviewers can look at the same output, disagree, and both be right, because the requirement never said what accurate meant or how often it had to hold.</p>
+    <p>What follows is predictable enough to write down in advance. The requirement enters the specification unchanged, because it sounds reasonable. User acceptance testing becomes a demo. Somebody runs forty examples, thirty-eight look good, and the figure 95% enters the project record. The system goes live on a sample far too small to support that number, and the first real evidence about its accuracy arrives from a downstream process that did not know it had become the control.</p>
+    <p class="pull">This is not a data science gap. Data scientists know how to evaluate models. It is an analysis gap: nobody turned the business requirement into a claim that could be measured, priced, and tested.</p>
+    <p>That translation is a business analyst's job, and it is the job this model does. The four stages below run on simulated pharmaceutical R&amp;D intake requests. The structure follows GAMP 5 Second Edition Appendix D11 on AI and machine learning in regulated systems: validation intensity proportional to intended use, quantitative acceptance criteria fixed before testing rather than inferred from results, and monitoring after release rather than a single qualification event.</p>
+  </section>
+
+  <section class="staged">
+    <div class="col">
+      <h2 data-stage="01">Which requests are worth the evidence</h2>
+      <p>Most intake frameworks score value against feasibility, where feasibility means "can we build it." In 2026 the answer is almost always yes; the model is an API call and the plumbing is solved. Scoring it wastes the meeting.</p>
+      <p>The axis that actually binds is evidence. Six factors, each anchored to a five-point rubric, roll into two numbers: what the organization gets if the thing works, and what it costs to demonstrate that it does. Volume, time displaced, and strategic pull make the first. Consequence of error, ground truth availability, verifiability, and regulatory scope make the second.</p>
+      <p>Two gates run before the tradeoff is even computed. A request with no defensible ground truth and no practical way for a person to check the output is not an expensive request. It is one where no acceptance criterion could ever fail, so there is no release decision to make and no amount of value rescues it. UC-11 below clears the value bar with a positive margin and is gated anyway. That is what a gate is for.</p>
+    </div>
+
+    <div class="wide scroll">
+      <table>
+        <caption>Stage 1 · portfolio intake, 13 simulated requests</caption>
+        <thead>
+          <tr>
+            <th>ID</th><th>Request</th><th class="n">Value</th><th class="n">Evidence cost</th><th class="n">Margin</th><th>Disposition</th><th>Binding constraint</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="id">UC-02</td><td>CRO contract term extraction</td><td class="n">68</td><td class="n">8</td><td class="n">+60</td><td><span class="tag t-build">BUILD</span></td><td>consequence of error 2/5</td></tr>
+          <tr><td class="id">UC-01</td><td>Protocol deviation triage</td><td class="n">75</td><td class="n">38</td><td class="n">+38</td><td><span class="tag t-build">BUILD</span></td><td>consequence of error 3/5</td></tr>
+          <tr><td class="id">UC-04</td><td>CSR patient narrative drafting</td><td class="n">75</td><td class="n">56</td><td class="n">+19</td><td><span class="tag t-pilot">PILOT</span></td><td>consequence of error 4/5</td></tr>
+          <tr><td class="id">UC-05</td><td>R&amp;D policy and SOP question answering</td><td class="n">43</td><td class="n">26</td><td class="n">+16</td><td><span class="tag t-pilot">PILOT</span></td><td>consequence of error 3/5</td></tr>
+          <tr><td class="id">UC-10</td><td>Governance minutes and actions</td><td class="n">33</td><td class="n">20</td><td class="n">+13</td><td><span class="tag t-pilot">PILOT</span></td><td>ground truth 3/5</td></tr>
+          <tr><td class="id">UC-07</td><td>Site feasibility questionnaires</td><td class="n">43</td><td class="n">31</td><td class="n">+11</td><td><span class="tag t-pilot">PILOT</span></td><td>ground truth 3/5</td></tr>
+          <tr><td class="id">UC-03</td><td>Literature screening for safety signals</td><td class="n">74</td><td class="n">63</td><td class="n">+11</td><td><span class="tag t-pilot">PILOT</span></td><td>consequence of error 5/5</td></tr>
+          <tr><td class="id">UC-06</td><td>AE case coding to MedDRA terms</td><td class="n">66</td><td class="n">56</td><td class="n">+10</td><td><span class="tag t-pilot">PILOT</span></td><td>consequence of error 5/5</td></tr>
+          <tr><td class="id">UC-11</td><td>Target hypothesis generation</td><td class="n">58</td><td class="n">51</td><td class="n">+6</td><td><span class="tag t-reframe">REFRAME</span></td><td>ground truth 5/5 · gated</td></tr>
+          <tr><td class="id">UC-09</td><td>SOP change impact analysis</td><td class="n">50</td><td class="n">50</td><td class="n">0</td><td><span class="tag t-pilot">PILOT</span></td><td>consequence of error 4/5</td></tr>
+          <tr><td class="id">UC-12</td><td>Legacy lab notebook search</td><td class="n">34</td><td class="n">44</td><td class="n">−10</td><td><span class="tag t-reframe">REFRAME</span></td><td>ground truth 4/5</td></tr>
+          <tr><td class="id">UC-08</td><td>Investigator brochure drafting</td><td class="n">59</td><td class="n">75</td><td class="n">−16</td><td><span class="tag t-reframe">REFRAME</span></td><td>consequence of error 4/5 · gated</td></tr>
+          <tr><td class="id">UC-13</td><td>Consent form translation review</td><td class="n">18</td><td class="n">75</td><td class="n">−58</td><td><span class="tag t-decline">DECLINE</span></td><td>consequence of error 5/5</td></tr>
+        </tbody>
+      </table>
+      <figcaption><b>Binding constraint</b> names the evidence factor contributing most above its floor, which is the single thing to change if a request is going to move. It carries more information than the disposition for the seven requests that land in PILOT, and the width of that band is a real limitation of the model: it separates the ends of a portfolio well and the middle poorly.</figcaption>
+    </div>
+
+    <div class="col">
+      <p>UC-13 is the one worth pausing on. First-line review of informed consent form translations sounds like an obvious win, and it is the request most likely to get executive air cover in a real portfolio. It fails on arithmetic. Low volume, a weak sponsor, and consent language sitting directly on the patient-safety pathway, which means the highest confidence tier and the largest labeled set of anything in the portfolio. Declining it at intake costs an hour. Declining it after eight months of pilot costs the credibility of the next six proposals.</p>
+    </div>
+  </section>
+
+  <section class="staged">
+    <div class="col">
+      <h2 data-stage="02">Which requirements can be accepted at all</h2>
+      <p>UC-02 goes forward. Eight requirements arrived from the intake workshop, written the way stakeholders write them. Three cannot be accepted as worded.</p>
+    </div>
+
+    <div class="wide">
+      <div class="reqs">
+        <div class="req is-untestable">
+          <span class="req-id">R-01</span>
+          <span class="req-text">"The system shall accurately extract payment terms, change order thresholds, and termination clauses from executed CRO agreements."</span>
+          <span class="req-verdict v-untestable"><b>UNTESTABLE</b> · Rests on an unmeasured predicate. No observation could falsify it, so no test of it can fail, so it cannot support a release decision. Returned with a rewrite template.</span>
+        </div>
+        <div class="req">
+          <span class="req-id">R-02</span>
+          <span class="req-text">"On a held-out set of executed CRO agreements labeled by two contract managers, the system shall achieve extraction accuracy of at least 95% across the three target field groups."</span>
+          <span class="req-verdict v-statistical"><b>STATISTICAL</b> · R-01 after the rewrite session. Metric, threshold, population, and adjudication all named. Proceeds to sizing.</span>
+        </div>
+        <div class="req">
+          <span class="req-id">R-03</span>
+          <span class="req-text">"The system shall log every extraction event with the source document version, the model version, the prompt version, and the identity of the reviewing user."</span>
+          <span class="req-verdict v-deterministic"><b>DETERMINISTIC</b> · Observable behavior, no rate claim. One scripted test case per branch. Ordinary validation work.</span>
+        </div>
+        <div class="req">
+          <span class="req-id">R-04</span>
+          <span class="req-text">"The system shall return extracted values within 60 seconds of document upload."</span>
+          <span class="req-verdict v-deterministic"><b>DETERMINISTIC</b> · Quantified single-value constraint, measured across consecutive transactions.</span>
+        </div>
+        <div class="req is-untestable">
+          <span class="req-id">R-05</span>
+          <span class="req-text">"Extracted values shall be presented in a clear and user-friendly layout alongside the relevant source text."</span>
+          <span class="req-verdict v-untestable"><b>UNTESTABLE</b> · Two unmeasured predicates. Real intent behind it; needs a usability measure or it belongs in the design brief rather than the acceptance criteria.</span>
+        </div>
+        <div class="req">
+          <span class="req-id">R-06</span>
+          <span class="req-text">"Every extracted value shall be traceable to the exact clause it came from, with citation integrity of at least 99%."</span>
+          <span class="req-verdict v-statistical"><b>STATISTICAL</b> · Properly formed, and unprovable. See stage 3.</span>
+        </div>
+        <div class="req">
+          <span class="req-id">R-07</span>
+          <span class="req-text">"The system shall reject documents that are not executed CRO agreements rather than attempting extraction."</span>
+          <span class="req-verdict v-statistical"><b>STATISTICAL by override</b> · Reads as a deterministic behavior and the rule-based classifier routes it that way. Whether a document is an executed agreement is a judgment the system will sometimes get wrong, and a two-case scripted test would never find out. Reclassified by the analyst.</span>
+        </div>
+        <div class="req is-untestable">
+          <span class="req-id">R-08</span>
+          <span class="req-text">"The system should be reliable and require minimal rework."</span>
+          <span class="req-verdict v-untestable"><b>UNTESTABLE</b> · A statement of intent. Worth keeping in the charter, not in the criteria.</span>
+        </div>
+      </div>
+      <figcaption>The classifier is rule-based rather than model-based, deliberately. A language model would sort these well enough, but the analyst then cannot explain to an auditor why a given requirement was routed the way it was, and the routing is the part that carries consequences. <b>R-07 is the known failure mode</b>: the rules read grammar, and grammar hides a rate claim inside a deterministic-sounding verb. The override exists because the rules are wrong there and the analyst is not.</figcaption>
+    </div>
+
+    <div class="col">
+      <p>Untestable requirements go back with a template rather than a finished sentence. Handing a stakeholder a rewrite they did not choose is how a system ends up measuring something nobody wanted. The blanks are the conversation.</p>
+    </div>
+  </section>
+
+  <section class="staged">
+    <div class="col">
+      <h2 data-stage="03">What the evidence costs</h2>
+      <p>An acceptance criterion on a probabilistic system is a claim about a population, tested on a sample. That means it has a sample size, and the sample size is not a detail for whoever writes the test plan to settle later. It is part of the requirement, and it has a price in expert labeling hours that belongs in the project estimate at intake.</p>
+      <p>Sizing runs off the Wilson score interval: the smallest sample at which, if the system performs as expected, the lower confidence bound clears the threshold. Two findings came out of it.</p>
+    </div>
+
+    <div class="wide scroll">
+      <table>
+        <caption>Stage 3 · sizing the acceptance criteria for UC-02</caption>
+        <thead>
+          <tr><th>Criterion</th><th>Metric</th><th class="n">Threshold</th><th class="n">Expected</th><th class="n">Required n</th><th class="n">SME hours</th><th>Verdict</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="id">R-02</td><td>extraction accuracy</td><td class="n">95.0%</td><td class="n">97.0%</td><td class="n">148</td><td class="n">59.2</td><td>Sized</td></tr>
+          <tr><td class="id">R-06</td><td>citation integrity</td><td class="n">99.0%</td><td class="n">99.0%</td><td class="n">—</td><td class="n">—</td><td><span class="tag t-decline">UNPROVABLE</span></td></tr>
+          <tr><td class="id">R-07</td><td>refusal rate</td><td class="n">98.0%</td><td class="n">99.5%</td><td class="n">81</td><td class="n">4.0</td><td>Sized</td></tr>
+        </tbody>
+      </table>
+      <figcaption>SME hours assume two independent reviewers per case, at 12 minutes per contract for extraction and 1.5 minutes for a scope judgment. <b>229 labeled cases, roughly ten reviewer-days.</b> On most AI features this is the largest single line of effort and the one most often missing from the estimate.</figcaption>
+    </div>
+
+    <div class="col">
+      <h3>Finding one · a threshold with no headroom cannot be demonstrated</h3>
+      <p>R-06 asks for 99% citation integrity from a system the team expects to deliver at 99%. There is no sample size at which that criterion can pass. A confidence bound only clears a threshold the system beats with room to spare; when expected performance sits exactly on the line, roughly half of all honest test runs land below it, and the other half pass by luck.</p>
+      <p>The fix is a lower threshold or a better system, and either way it is an hour-long conversation at design time. Discovering it during acceptance testing costs the test, the schedule, and usually the working relationship with the quality reviewer who wrote the requirement in good faith.</p>
+
+      <h3>Finding two · the risk classification has a price</h3>
+      <p>The confidence level is set by the use case's consequence-of-error score, not chosen by whoever runs the test. Same criterion, same threshold, three risk tiers:</p>
+    </div>
+
+    <div class="wide scroll" style="max-width: 44rem;">
+      <table>
+        <thead>
+          <tr><th>Confidence</th><th>Risk tier</th><th class="n">Required n</th><th class="n">SME hours</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="num">90%</td><td>1–2 · no GxP scope</td><td class="n">148</td><td class="n">59.2</td></tr>
+          <tr><td class="num">95%</td><td>3–4 · GxP scope</td><td class="n">280</td><td class="n">112.0</td></tr>
+          <tr><td class="num">99%</td><td>5 · submission or safety pathway</td><td class="n">611</td><td class="n">244.4</td></tr>
+        </tbody>
+      </table>
+      <figcaption>R-02, held at a 95% threshold and 97% expected performance throughout. Moving a use case one risk tier up is not a documentation change. It is a different project estimate, and the business should see the number before it is asked to approve the classification.</figcaption>
+    </div>
+  </section>
+
+  <section class="staged">
+    <div class="col">
+      <h2 data-stage="04">Whether the evidence supports release</h2>
+      <p>The acceptance test runs against the labeled set. Outcomes below are drawn from a fixed true rate under a seeded generator, with the true rates set slightly below the design-time expectations, which is the ordinary case; teams estimate their own systems optimistically.</p>
+      <p>Each criterion is judged on the lower confidence bound, not the point estimate. That single choice is what the whole model is built around.</p>
+    </div>
+
+    <div class="wide">
+      <figure class="panel">
+        <div class="panel-head">
+          <span class="panel-title">Stage 4 · observed rate against the threshold, with 90% lower bound</span>
+          <span class="legend">
+            <span><svg class="swatch" viewBox="0 0 11 11" aria-hidden="true"><rect x="0" y="0" width="11" height="11" fill="var(--surface-sunk)" stroke="var(--rule-strong)"></rect></svg>below threshold</span>
+            <span><svg class="swatch" viewBox="0 0 11 11" aria-hidden="true"><rect x="0" y="4" width="11" height="3" fill="var(--ink-soft)"></rect></svg>bound to observed</span>
+            <span><svg class="swatch" viewBox="0 0 11 11" aria-hidden="true"><rect x="4" y="0" width="3" height="11" fill="var(--accent)"></rect></svg>threshold</span>
+          </span>
+        </div>
+
+        <svg viewBox="0 0 760 250" role="img" aria-label="R-02 observed 95.95 percent with a 90 percent lower bound of 93.31 percent against a 95 percent threshold, inconclusive. R-07 observed 100 percent with a lower bound of 98.01 percent against a 98 percent threshold, pass.">
+          <!-- gridlines -->
+          <g stroke="var(--rule)" stroke-width="1">
+            <line x1="130" y1="34" x2="130" y2="196"></line>
+            <line x1="271.2" y1="34" x2="271.2" y2="196"></line>
+            <line x1="412.4" y1="34" x2="412.4" y2="196"></line>
+            <line x1="553.5" y1="34" x2="553.5" y2="196"></line>
+            <line x1="694.7" y1="34" x2="694.7" y2="196"></line>
+          </g>
+
+          <!-- ROW 1: R-02 -->
+          <text class="rowlab" x="118" y="72" text-anchor="end">R-02</text>
+          <text class="rowsub" x="118" y="88" text-anchor="end">n=148</text>
+          <rect x="130" y="52" width="211.8" height="38" fill="var(--surface-sunk)"></rect>
+          <line x1="222.5" y1="71" x2="408.8" y2="71" stroke="var(--ink-soft)" stroke-width="3"></line>
+          <line x1="222.5" y1="59" x2="222.5" y2="83" stroke="var(--ink-soft)" stroke-width="2.5"></line>
+          <circle cx="408.8" cy="71" r="6" fill="var(--ink)"></circle>
+          <line x1="341.8" y1="44" x2="341.8" y2="98" stroke="var(--accent)" stroke-width="3"></line>
+          <text class="valtag" x="222.5" y="110" text-anchor="middle" fill="var(--ink-soft)">93.31% bound</text>
+          <text class="valtag" x="408.8" y="110" text-anchor="middle" fill="var(--ink)">95.95% observed</text>
+          <text class="valtag" x="341.8" y="38" text-anchor="middle" fill="var(--accent)">95% threshold</text>
+
+          <!-- ROW 2: R-07 -->
+          <text class="rowlab" x="118" y="160" text-anchor="end">R-07</text>
+          <text class="rowsub" x="118" y="176" text-anchor="end">n=81</text>
+          <rect x="130" y="140" width="423.5" height="38" fill="var(--surface-sunk)"></rect>
+          <line x1="554.2" y1="159" x2="694.7" y2="159" stroke="var(--pass)" stroke-width="3"></line>
+          <line x1="554.2" y1="147" x2="554.2" y2="171" stroke="var(--pass)" stroke-width="2.5"></line>
+          <circle cx="694.7" cy="159" r="6" fill="var(--pass)"></circle>
+          <line x1="553.5" y1="132" x2="553.5" y2="186" stroke="var(--accent)" stroke-width="3"></line>
+          <text class="valtag" x="694.7" y="198" text-anchor="end" fill="var(--pass)">98.01% bound clears the 98% threshold</text>
+          <text class="valtag" x="694.7" y="126" text-anchor="middle" fill="var(--pass)">100% observed</text>
+
+          <!-- axis -->
+          <line x1="130" y1="212" x2="694.7" y2="212" stroke="var(--rule-strong)" stroke-width="1"></line>
+          <g class="ax" text-anchor="middle">
+            <text x="130" y="230">92%</text>
+            <text x="271.2" y="230">94%</text>
+            <text x="412.4" y="230">96%</text>
+            <text x="553.5" y="230">98%</text>
+            <text x="694.7" y="230">100%</text>
+          </g>
+        </svg>
+
+        <figcaption>R-02 observed 95.95% against a 95% threshold. On a slide that reads as a pass. The 90% lower bound is 93.31%, so the sample does not support the claim, and the honest report is not "96% accurate" but "somewhere above 93.3%, which is not what we asked for." R-07 clears its threshold by a margin of 0.01 percentage points on 81 cases, which is what a criterion sized correctly and met looks like: no drama, no headroom to spare.</figcaption>
+      </figure>
+    </div>
+
+    <div class="verdict">
+      <span class="verdict-stamp">HOLD</span>
+      <p>No criterion failed on the merits. R-02 is underpowered. Extend the labeled set and rerun.</p>
+      <p>One criterion blocks release on its own. There is no aggregate score across criteria, because an aggregate lets a strong accuracy number offset a failed citation-integrity criterion, and nobody would approve that trade if it were stated out loud in the room.</p>
+      <p>No monitoring plan is issued for a system that has not been released.</p>
+    </div>
+
+    <div class="col">
+      <p>The result the model exists to produce is that one. A team without this step ships R-02, writes 96% in the closure memo, and is telling the truth as far as they know it. The number is real. It just does not mean what the memo says it means, and nobody involved has done anything wrong except skip a sample-size calculation nobody asked them for.</p>
+      <p>When release is granted, the monitoring bands are derived from the release evidence rather than chosen: the alert line sits at the approved lower bound, so the system is flagged when it drops below the performance it was actually validated at, not below a round number somebody liked. Falling through the escalation line suspends the automated path and opens change control rather than triggering a silent retrain.</p>
+    </div>
+  </section>
+
+  <section class="staged">
+    <div class="col">
+      <h2 data-stage="05">What this does not do</h2>
+      <p>It does not evaluate models, choose architectures, or write prompts. It does not tell anyone whether a system is good. It tells them whether they are in a position to find out, what finding out will cost, and whether the evidence in hand supports the decision about to be made.</p>
+      <p>Its resolution is uneven. Seven of thirteen requests land in PILOT, a band 20 points wide, and within it the disposition carries less information than the binding constraint. The rule-based classifier misroutes rate claims that are phrased as behaviors, which is why the analyst override exists and why R-07 is documented rather than quietly corrected. Both are worth stating plainly; a scoring model whose author cannot name its failure modes should not be trusted with a portfolio.</p>
+    </div>
+
+    <footer>
+      <p><b>Simulated data.</b> Every use case, requirement, and test outcome here is constructed to exercise the model across its range. No real program, system, vendor, or scoring session is represented, and no proprietary information from any employer appears in the model or this write-up.</p>
+      <p>Python 3.11 standard library only. Four modules, 20 unit tests weighted toward the statistics, since that is the part that would fail silently if it were wrong. Built by Jason Santos, Schaumburg IL. <a href="https://j-santos21.github.io">j-santos21.github.io</a> · <a href="https://linkedin.com/in/jasonsantos21">linkedin.com/in/jasonsantos21</a></p>
+    </footer>
+  </section>
+
+</div>
+
+</body>
+</html>
