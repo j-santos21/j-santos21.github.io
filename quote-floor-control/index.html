@@ -1,0 +1,174 @@
+<title>Quote Floor Control</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Layout: single reading column, wide tables scroll inside their own wrapper.
+   Palette: paper-grey ground, ink text, one deep teal accent, semantic pass/fail kept separate. */
+:root {
+  --bg: #f5f6f3; --surface: #ffffff; --fg: #1c2321; --muted: #5a6662;
+  --line: #d9ddd8; --accent: #1d5e5a; --accent-soft: #e0eeec;
+  --ok-bg: #dcefe1; --ok-fg: #1d5a31; --bad-bg: #f6dcd8; --bad-fg: #8a2b1f;
+  --code-bg: #eceee9;
+  --sans: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #161b1a; --surface: #1d2423; --fg: #e4e9e6; --muted: #9aa7a2;
+  --line: #333d3b; --accent: #6fc3bb; --accent-soft: #223532;
+  --ok-bg: #1f3a29; --ok-fg: #8fd6a4; --bad-bg: #432522; --bad-fg: #f0a79d;
+  --code-bg: #232b2a; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #161b1a; --surface: #1d2423; --fg: #e4e9e6; --muted: #9aa7a2;
+  --line: #333d3b; --accent: #6fc3bb; --accent-soft: #223532;
+  --ok-bg: #1f3a29; --ok-fg: #8fd6a4; --bad-bg: #432522; --bad-fg: #f0a79d;
+  --code-bg: #232b2a; color-scheme: dark; }
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font: 16px/1.6 var(--sans); }
+.wrap { max-width: 860px; margin: 0 auto; padding-block: 40px 72px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1 { font-size: clamp(2rem, 5vw, 2.75rem); line-height: 1.1; margin: 0 0 12px; letter-spacing: -0.02em; text-wrap: balance; }
+h2 { font-size: 1.3rem; margin: 48px 0 12px; letter-spacing: -0.01em; text-wrap: balance; }
+h3 { font-size: 1rem; margin: 24px 0 6px; }
+p { margin: 0 0 14px; max-width: 68ch; }
+.lede { font-size: 1.1rem; color: var(--muted); max-width: 62ch; }
+.tag { display: inline-block; font: 500 0.72rem/1 var(--mono); letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--accent); background: var(--accent-soft); padding: 6px 8px; margin-bottom: 16px; }
+.note { border-left: 3px solid var(--accent); background: var(--surface); padding: 12px 16px; margin: 20px 0; max-width: 68ch; }
+.note p:last-child { margin: 0; }
+.scroll { overflow-x: auto; border: 1px solid var(--line); background: var(--surface); margin: 12px 0 20px; }
+table { border-collapse: collapse; width: 100%; font-size: 0.9rem; min-width: 560px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+th { font: 600 0.72rem/1.3 var(--mono); text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); background: var(--bg); }
+tr:last-child td { border-bottom: 0; }
+td.id { font-family: var(--mono); font-weight: 500; white-space: nowrap; }
+.mono { font-family: var(--mono); font-size: 0.85rem; }
+pre { margin: 12px 0 20px; background: var(--code-bg); border: 1px solid var(--line); padding: 14px 16px; overflow-x: auto;
+  font: 0.84rem/1.55 var(--mono); }
+code { font-family: var(--mono); font-size: 0.88em; background: var(--code-bg); padding: 1px 5px; }
+pre code { background: none; padding: 0; font-size: inherit; }
+.pill { display: inline-block; font: 600 0.72rem/1 var(--mono); padding: 4px 8px; text-transform: uppercase; letter-spacing: 0.04em; }
+.pill.ok { background: var(--ok-bg); color: var(--ok-fg); }
+.pill.bad { background: var(--bad-bg); color: var(--bad-fg); }
+.stats { display: flex; flex-wrap: wrap; gap: 8px 28px; margin: 16px 0 8px; font-size: 0.95rem; }
+.stats b { font: 600 1.4rem/1 var(--mono); display: block; }
+.stats span { color: var(--muted); font-size: 0.8rem; }
+ul { margin: 0 0 14px; padding-left: 1.2em; max-width: 68ch; }
+li { margin-bottom: 6px; }
+.guide { background: var(--surface); border: 1px solid var(--line); padding: 20px 22px; max-width: 68ch; }
+.guide h3:first-child { margin-top: 0; }
+footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.85rem; }
+a { color: var(--accent); }
+a:focus-visible, .scroll:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+</style>
+<div class="wrap">
+<span class="tag">Requirements to configuration</span>
+<h1>Quote Floor Control</h1>
+<p class="lede">A discovery-to-configuration package for one control: stopping a financing quote from being released below its authorized rate floor. It includes the requirements, the configuration spec, the test matrix, and the user guide.</p>
+<div class="note"><p><strong>What this is and is not.</strong> The client, the object, and the numbers are simulated. No employer rules, rates, or records are used. The configuration spec is written for Salesforce and has not been deployed to an org. The Python model in this package checks the logic of the two validation rules; it does not prove how Salesforce will behave. Section 7 lists what a sandbox pass still has to confirm.</p></div>
+
+<h2>1. The problem</h2>
+<p>A simulated premium finance lender quotes a sell rate to insurance agencies. Each quote has an authorized floor rate, and a quote released below that floor loses margin on every installment. Releases happen after a manual review, and the review is the only control. The client wants the system to refuse an out-of-policy release instead of relying on a reviewer noticing.</p>
+<p>The pattern comes from a real class of error I caught in release testing: a configuration change that would have let quotes out below the authorized floor. This page models the control that would have made that error impossible to ship quietly.</p>
+
+<h2>2. Discovery</h2>
+<p>These are the questions I would bring to the client's sales, operations, and finance leads, with the assumption I used so the build could proceed. Each assumption would be confirmed in the first working session.</p>
+<div class="scroll" tabindex="0"><table>
+<thead><tr><th>Question</th><th>Why it changes the build</th><th>Assumed answer</th></tr></thead>
+<tbody>
+<tr><td>Should sales be able to save a draft below the floor while negotiating?</td><td>Decides whether the rule fires on every save or only on release.</td><td>Yes. Block only at release (R4).</td></tr>
+<tr><td>Who can approve an exception, and where is it recorded?</td><td>Decides whether the override is a field, an approval process, or a permission.</td><td>One checkbox, set by a manager through a separate approval step (R2). The approval process itself is out of scope here.</td></tr>
+<tr><td>Is the floor set per quote or per agency?</td><td>Decides where the floor lives and who maintains it.</td><td>Copied onto the quote at creation so a later agency change does not rewrite history.</td></tr>
+<tr><td>Is there a cap on broker fees?</td><td>Adds a second rule with the same shape.</td><td>Yes, a per-quote cap (R6).</td></tr>
+<tr><td>Can quotes be created already released, for example by an import?</td><td>Decides whether the rule must also run on record creation.</td><td>Yes. The rule must cover creation (R7).</td></tr>
+<tr><td>What happens to quotes already released below the floor?</td><td>Existing data may block ordinary edits after go-live.</td><td>Out of scope. Flagged for a data review before deployment.</td></tr>
+</tbody></table></div>
+
+<h2>3. Requirements and traceability</h2>
+<p>Every requirement maps to at least one configuration item and at least one test. The model checks this on every run and fails if a requirement has no test or a test cites a requirement that does not exist.</p>
+<div class="scroll" tabindex="0"><table>
+<thead><tr><th>ID</th><th>Requirement</th><th>Configuration</th><th>Tests</th></tr></thead>
+<tbody><tr><td class='id'>R1</td><td>A quote cannot be released with a sell rate below its authorized floor.</td><td>Validation rule QF_001</td><td class='mono'>T01, T02, T03, T14</td></tr><tr><td class='id'>R2</td><td>A floor or fee exception can be released only with approval recorded on the quote.</td><td>Field Override_Approved__c<br>Validation rules QF_001, QF_002</td><td class='mono'>T04, T13</td></tr><tr><td class='id'>R3</td><td>A quote cannot be released if the sell rate or the floor is blank.</td><td>Validation rule QF_001</td><td class='mono'>T05, T06</td></tr><tr><td class='id'>R4</td><td>Sales can save and review draft quotes below the floor while negotiating.</td><td>Validation rules fire on Released status only</td><td class='mono'>T07, T08</td></tr><tr><td class='id'>R5</td><td>Changing the rate on an already released quote is checked again.</td><td>Validation rules use ISCHANGED on rate and floor fields</td><td class='mono'>T09, T10</td></tr><tr><td class='id'>R6</td><td>A quote cannot be released when the broker fee exceeds the agency&#x27;s cap.</td><td>Validation rule QF_002<br>Field Broker_Fee_Cap__c</td><td class='mono'>T11, T12</td></tr><tr><td class='id'>R7</td><td>A quote created directly as Released is checked the same way.</td><td>ISNEW() in the rule formulas</td><td class='mono'>T15, T16</td></tr></tbody></table></div>
+
+<h2>4. Configuration spec</h2>
+<h3>Object and fields</h3>
+<p>Custom object <code>Premium_Finance_Quote__c</code>.</p>
+<div class="scroll" tabindex="0"><table>
+<thead><tr><th>Field</th><th>Type</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td class="mono">Status__c</td><td>Picklist</td><td>Draft, Pending Review, Released</td></tr>
+<tr><td class="mono">Sell_Rate__c</td><td>Percent (3 decimals)</td><td>Quoted APR</td></tr>
+<tr><td class="mono">Authorized_Floor_Rate__c</td><td>Percent (3 decimals)</td><td>Copied at creation; editable by managers only</td></tr>
+<tr><td class="mono">Broker_Fee__c</td><td>Currency</td><td></td></tr>
+<tr><td class="mono">Broker_Fee_Cap__c</td><td>Currency</td><td>Copied at creation</td></tr>
+<tr><td class="mono">Override_Approved__c</td><td>Checkbox</td><td>Edit access limited to the manager profile</td></tr>
+</tbody></table></div>
+
+<h3>Validation rule QF_001: release below the floor</h3>
+<p>Error message: "Sell rate is below the authorized floor. Request override approval." A blank rate or floor returns a separate message asking for both values.</p>
+<pre><code>AND(
+  ISPICKVAL(Status__c, "Released"),
+  OR(ISNEW(), ISCHANGED(Status__c), ISCHANGED(Sell_Rate__c),
+     ISCHANGED(Authorized_Floor_Rate__c)),
+  OR(
+    ISBLANK(Sell_Rate__c),
+    ISBLANK(Authorized_Floor_Rate__c),
+    AND(Sell_Rate__c &lt; Authorized_Floor_Rate__c, NOT(Override_Approved__c))
+  )
+)</code></pre>
+
+<h3>Validation rule QF_002: broker fee over the cap</h3>
+<pre><code>AND(
+  ISPICKVAL(Status__c, "Released"),
+  OR(ISNEW(), ISCHANGED(Status__c), ISCHANGED(Broker_Fee__c),
+     ISCHANGED(Broker_Fee_Cap__c)),
+  Broker_Fee__c &gt; Broker_Fee_Cap__c,
+  NOT(Override_Approved__c)
+)</code></pre>
+
+<p>The <code>OR(ISNEW(), ISCHANGED(...))</code> wrapper is deliberate. Without it, any edit to a released quote, such as a note or a contact, would re-run the check and block unrelated work. Without <code>ISNEW()</code>, a record created directly as Released would skip the rule entirely, because <code>ISCHANGED</code> is false on insert. Tests T10, T15, and T16 cover both sides of that.</p>
+
+<h2>5. Test results</h2>
+<div class="stats">
+<div><b>16/16</b><span>tests passed</span></div>
+<div><b>7/7</b><span>requirements covered</span></div>
+<div><b>4/4</b><span>deliberate breaks caught</span></div>
+</div>
+<div class="scroll" tabindex="0"><table>
+<thead><tr><th>Test</th><th>Req</th><th>Scenario</th><th>Expected</th><th>Actual</th><th>Result</th></tr></thead>
+<tbody><tr><td class='id'>T01</td><td class='id'>R1</td><td>Release at a sell rate above the floor</td><td>Saves</td><td>Saves</td><td><span class='pill ok'>Pass</span></td></tr><tr><td class='id'>T02</td><td class='id'>R1</td><td>Release exactly at the floor (boundary)</td><td>Saves</td><td>Saves</td><td><span class='pill ok'>Pass</span></td></tr><tr><td class='id'>T03</td><td class='id'>R1</td><td>Release one basis point below the floor</td><td>Blocked by QF_001</td><td>Blocked by QF_001</td><td><span class='pill ok'>Pass</span></td></tr><tr><td class='id'>T04</td><td class='id'>R2</td><td>Release below the floor with override approved</td><td>Saves</td><td>Saves</td><td><span class='pill ok'>Pass</span></td></tr><tr><td class='id'>T05</td><td class='id'>R3</td><td>Release with a blank sell rate</td><td>Blocked by QF_001</td><td>Blocked by QF_001</td><td><span class='pill ok'>Pass</span></td></tr><tr><td class='id'>T06</td><td class='id'>R3</td><td>Release with a blank authorized floor</td><td>Blocked by QF_001</td><td>Blocked by QF_001</td><td><span class='pill ok'>Pass</span></td></tr><tr><td class='id'>T07</td><td class='id'>R4</td><td>Save a Draft below the floor (work in progress)</td><td>Saves</td><td>Saves</td><td><span class='pill ok'>Pass</span></td></tr><tr><td class='id'>T08</td><td class='id'>R4</td><td>Move to Pending Review below the floor</td><td>Saves</td><td>Saves</td><td><span class='pill ok'>Pass</span></td></tr><tr><td class='id'>T09</td><td class='id'>R5</td><td>Edit the sell rate on a released quote to below the floor</td><td>Blocked by QF_001</td><td>Blocked by QF_001</td><td><span class='pill ok'>Pass</span></td></tr><tr><td class='id'>T10</td><td class='id'>R5</td><td>Edit an unrelated field on a released quote</td><td>Saves</td><td>Saves</td><td><span class='pill ok'>Pass</span></td></tr><tr><td class='id'>T11</td><td class='id'>R6</td><td>Release with the broker fee at the cap (boundary)</td><td>Saves</td><td>Saves</td><td><span class='pill ok'>Pass</span></td></tr><tr><td class='id'>T12</td><td class='id'>R6</td><td>Release with the broker fee over the cap</td><td>Blocked by QF_002</td><td>Blocked by QF_002</td><td><span class='pill ok'>Pass</span></td></tr><tr><td class='id'>T13</td><td class='id'>R2</td><td>Release over the fee cap with override approved</td><td>Saves</td><td>Saves</td><td><span class='pill ok'>Pass</span></td></tr><tr><td class='id'>T14</td><td class='id'>R1</td><td>Release below the floor and over the fee cap, no override</td><td>Blocked by QF_001, QF_002</td><td>Blocked by QF_001, QF_002</td><td><span class='pill ok'>Pass</span></td></tr><tr><td class='id'>T15</td><td class='id'>R7</td><td>Create a new quote directly as Released below the floor</td><td>Blocked by QF_001</td><td>Blocked by QF_001</td><td><span class='pill ok'>Pass</span></td></tr><tr><td class='id'>T16</td><td class='id'>R7</td><td>Create a new quote directly as Released within limits</td><td>Saves</td><td>Saves</td><td><span class='pill ok'>Pass</span></td></tr></tbody></table></div>
+
+<h3>Do the tests fail when the rules are wrong?</h3>
+<p>A suite that has only ever passed proves little. I broke QF_001 four ways and reran the matrix. Each break failed at least one test.</p>
+<div class="scroll" tabindex="0"><table>
+<thead><tr><th>Deliberate break</th><th>Tests that failed</th><th>Result</th></tr></thead>
+<tbody><tr><td>Floor check uses &lt;= instead of &lt;</td><td class='mono'>T02</td><td><span class='pill ok'>Caught</span></td></tr><tr><td>Override flag ignored</td><td class='mono'>T04</td><td><span class='pill ok'>Caught</span></td></tr><tr><td>Rule fires on drafts, not only on release</td><td class='mono'>T07, T08</td><td><span class='pill ok'>Caught</span></td></tr><tr><td>ISNEW() missing, new records skip the rule</td><td class='mono'>T15</td><td><span class='pill ok'>Caught</span></td></tr></tbody></table></div>
+
+<h2>6. User guide</h2>
+<div class="guide">
+<h3>What changed for sales users</h3>
+<p>You can still create and edit draft quotes at any rate. The check runs when you move a quote to Released.</p>
+<h3>If the save is blocked</h3>
+<ul>
+<li><strong>"Sell rate is below the authorized floor."</strong> Raise the rate to the floor or above, or ask your manager to approve an exception.</li>
+<li><strong>"Broker fee exceeds the cap."</strong> Lower the fee to the cap or below, or ask your manager to approve an exception.</li>
+<li><strong>"Sell rate and authorized floor are required."</strong> One of the two fields is empty. Fill it in and save again.</li>
+</ul>
+<h3>If you are a manager</h3>
+<p>Tick <strong>Override Approved</strong> only after you have approved the exception in the approval step. The box clears nothing else, so the quote still needs its rate and fee values.</p>
+<h3>Released quotes</h3>
+<p>Editing the rate on a released quote runs the same check again. Editing other fields does not.</p>
+</div>
+
+<h2>7. What a sandbox pass still has to confirm</h2>
+<ul>
+<li>That <code>ISNEW()</code> and <code>ISCHANGED()</code> behave as modeled on records loaded by the data import tool and by any flow that updates quotes.</li>
+<li>That the error messages appear next to the right field in the page layout and read clearly to a sales user.</li>
+<li>That quotes already released below the floor do not block ordinary edits after deployment. This needs a data query before go-live, not a rule change.</li>
+<li>That field-level access on <code>Override_Approved__c</code> matches the profiles the client actually uses.</li>
+</ul>
+<p>The right next step in a real engagement is to load the object and rules into a developer sandbox and run the sixteen tests by hand through the interface, then record where the org and the model disagree.</p>
+
+<footer>Jason Santos. Simulated scenario. The rule model is <code>quote_floor.py</code>; this page is generated from its test output.</footer>
+</div>
